@@ -23,18 +23,15 @@ public abstract class BaseOject : IBaseOject, ISoftDeleteEntity
 
     [Column("UPDATEDBY", Order = int.MaxValue - 2)]
     [StringLength(50)]
-    [Required]
     [Display(Name = nameof(Updatedby), ResourceType = typeof(L))]
     public string Updatedby { get; set; } = string.Empty;
 
     [Column("UPDATED", Order = int.MaxValue - 1)]
     [Precision(3)]
-    [Required]
     [Display(Name = nameof(Updated), ResourceType = typeof(L))]
     public DateTime Updated { get; set; }
 
     [Column("ACTIVE", Order = int.MaxValue)]
-    [Required]
     [Display(Name = nameof(Active), ResourceType = typeof(L))]
     public bool Active { get; set; } = true;
 }

@@ -37,11 +37,11 @@ public class BaseDbContext : DbContext
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
     {
+        ChangeTracker.DetectChanges();
         softDelete();
-
         var auditEntries = HandleAuditingBeforeSaveChanges(DbUser.UserName);
 
-        ChangeTracker.DetectChanges();
+        //ChangeTracker.DetectChanges();
         int result = await base.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
         await HandleAuditingAfterSaveChangesAsync(auditEntries, cancellationToken);
@@ -110,7 +110,8 @@ public class BaseDbContext : DbContext
                         {
                             property.CurrentValue = property.OriginalValue;
                         }
-                        if (property.IsModified && entry.Entity is ISoftDeleteEntity && property.OriginalValue == null && property.CurrentValue != null)
+                        if (property.IsModified && entry.Entity is ISoftDeleteEntity
+                            && propertyName == nameof(ISoftDeleteEntity.Active) && Convert.ToBoolean(property.CurrentValue) == false)
                         {
                             trailEntry.ChangedColumns.Add(propertyName);
                             trailEntry.TrailType = TrailType.Delete;
@@ -120,7 +121,7 @@ public class BaseDbContext : DbContext
                         else if (property.IsModified && property.OriginalValue?.Equals(property.CurrentValue) == false)
                         {
                             trailEntry.ChangedColumns.Add(propertyName);
-                            trailEntry.TrailType = TrailType.Update;
+                            if (trailEntry.TrailType == default) trailEntry.TrailType = TrailType.Update;
                             trailEntry.OldValues[propertyName] = property.OriginalValue;
                             trailEntry.NewValues[propertyName] = property.CurrentValue;
                         }
@@ -169,16 +170,18 @@ public class BaseDbContext : DbContext
     {
         foreach (var entry in ChangeTracker.Entries<ISoftDeleteEntity>().ToList())
         {
-            entry.Entity.Updated = DateTime.UtcNow;
-            entry.Entity.Updatedby = DbUser.UserName;
             if (entry.State == EntityState.Deleted)
             {
                 entry.Entity.Active = false;
                 entry.State = EntityState.Modified;
+                entry.Entity.Updated = DateTime.UtcNow;
+                entry.Entity.Updatedby = DbUser.UserName;
             }
             else if (entry.State == EntityState.Modified || entry.State == EntityState.Added)
             {
                 entry.Entity.Active = true;
+                entry.Entity.Updated = DateTime.UtcNow;
+                entry.Entity.Updatedby = DbUser.UserName;
             }
         }
     }

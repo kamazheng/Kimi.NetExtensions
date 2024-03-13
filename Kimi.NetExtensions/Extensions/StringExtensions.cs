@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Data.SqlClient;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Globalization;
 using System.Text.RegularExpressions;
@@ -287,5 +288,17 @@ public static class StringExtentions
     public static object? ToType(this string jsonString, Type type)
     {
         return JsonConvert.DeserializeObject(jsonString, type);
+    }
+
+    public static double? TryToDoubleElseZero(this string? inputString)
+    {
+        Double.TryParse(inputString, out var doubleResult);
+        return doubleResult;
+    }
+    public static bool IsTrustedConnection(this string? connectionString)
+    {
+        SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder(connectionString);
+
+        return builder.IntegratedSecurity;
     }
 }

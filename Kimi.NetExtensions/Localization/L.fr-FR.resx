@@ -225,4 +225,13 @@
   <data name="Domain" xml:space="preserve">
     <value>Domaine</value>
   </data>
+  <data name="Updatedby" xml:space="preserve">
+    <value>Mis à jour par</value>
+  </data>
+  <data name="Active" xml:space="preserve">
+    <value>Actif</value>
+  </data>
+  <data name="Id" xml:space="preserve">
+    <value>Identifiant</value>
+  </data>
 </root>

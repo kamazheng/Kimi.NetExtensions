@@ -61,6 +61,15 @@ namespace Kimi.NetExtensions.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Active.
+        /// </summary>
+        public static string Active {
+            get {
+                return ResourceManager.GetString("Active", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Bool Value.
         /// </summary>
         public static string BoolValue {
@@ -147,6 +156,15 @@ namespace Kimi.NetExtensions.Localization {
         public static string Email {
             get {
                 return ResourceManager.GetString("Email", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Id.
+        /// </summary>
+        public static string Id {
+            get {
+                return ResourceManager.GetString("Id", resourceCulture);
             }
         }
         
@@ -354,6 +372,15 @@ namespace Kimi.NetExtensions.Localization {
         public static string Updated {
             get {
                 return ResourceManager.GetString("Updated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Updated by.
+        /// </summary>
+        public static string Updatedby {
+            get {
+                return ResourceManager.GetString("Updatedby", resourceCulture);
             }
         }
         

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Negotiate;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 
 /// <summary> 该函数是一个中间件类，用于在特定URL路径下进行身份验证。
@@ -20,6 +21,16 @@ public class ChallengeNegotiateUser
 
     public async Task Invoke(HttpContext context)
     {
+        var endpoint = context.GetEndpoint();
+        if (endpoint != null)
+        {
+            var metadata = endpoint.Metadata.GetMetadata<IAllowAnonymous>();
+            if (metadata != null)
+            {
+                await _next(context);
+                return;
+            }
+        }
         var url = context.Request.Path;
         if (url.StartsWithSegments(_url) || string.IsNullOrEmpty(url))
         {

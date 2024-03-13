@@ -193,7 +193,7 @@
     <value>登录ID</value>
   </data>
   <data name="Name" xml:space="preserve">
-    <value>姓名</value>
+    <value>名字</value>
   </data>
   <data name="Password" xml:space="preserve">
     <value>密码</value>
@@ -224,5 +224,14 @@
   </data>
   <data name="Domain" xml:space="preserve">
     <value>域</value>
+  </data>
+  <data name="Updatedby" xml:space="preserve">
+    <value>更新</value>
+  </data>
+  <data name="Active" xml:space="preserve">
+    <value>活动</value>
+  </data>
+  <data name="Id" xml:space="preserve">
+    <value>ID</value>
   </data>
 </root>

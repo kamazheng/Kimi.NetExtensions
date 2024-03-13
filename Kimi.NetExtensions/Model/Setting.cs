@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Kimi.NetExtensions.Model;
 
 [Table("Setting", Schema = DbSchema.Reference)]
-public partial class Setting : ISoftDeleteEntity, IAuditableEntity, IWriteAccessEntity, IReadAccessEntity
+public partial class Setting : ISoftDeleteEntity, IAuditableEntity, IWriteAccessEntity
 {
     [Key]
     [Column("SettingPK")]
