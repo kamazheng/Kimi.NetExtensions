@@ -1,6 +1,5 @@
 ﻿public static class AsyncUtil
 {
-    static AsyncUtil() { LicenceHelper.CheckLicense(); }
     private static readonly TaskFactory _taskFactory = new
                     (CancellationToken.None,
                     TaskCreationOptions.None,

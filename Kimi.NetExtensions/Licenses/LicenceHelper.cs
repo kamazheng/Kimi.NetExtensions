@@ -1,36 +1,68 @@
 ﻿using Newtonsoft.Json;
+using System.Reflection;
+using System.Text;
 
 public static class LicenceHelper
 {
     private static string? encryptLicenseCode;
-    private static string? companyName;
+    private static string? hostMachine;
     private static string? appName;
+    private static string? publicKey;
+    private static string? licenseServer;
 
     /// <summary>
-    /// Set License paramater, reading from setting files. Json Key - KimiExtension:LicenseCode,CompanyNamem,AppName
+    ///
     /// </summary>
-    public static void SetParameter()
+    /// <param name="_licenseServer"></param>
+    public static void SetParameter(string? _licenseServer = null)
     {
-        encryptLicenseCode = ConfigReader.Configuration["KimiExtension:LicenseCode"];
-        companyName = ConfigReader.Configuration["KimiExtension:CompanyName"]; ;
-        appName = ConfigReader.Configuration["KimiExtension:AppName"]; ;
+        hostMachine = Environment.MachineName;
+        appName = Assembly.GetEntryAssembly()?.GetName()?.Name;
+        licenseServer = _licenseServer ?? "https://molexchengduqa.azurewebsites.net/License/GetLicense";
+        GetReleasedLicense();
     }
 
-    public static void SetParameter(string licenseCode, string company, string app)
+    private static void GetReleasedLicense()
     {
+        var postBody = new RequestBody
+        {
+            HostMachine = hostMachine!,
+            AppName = appName!,
+            IsDebug = EnvironmentExtension.IsDebug
+        };
+        using (var client = new HttpClient())
+        {
+            var content = new StringContent(JsonConvert.SerializeObject(postBody), Encoding.UTF8, "application/json");
+            var result = AsyncUtil.RunSync(() => client.PostAsync(licenseServer, content));
+            var response = AsyncUtil.RunSync(() => result.Content.ReadAsStringAsync());
+            if (result.IsSuccessStatusCode)
+            {
+                var releaseLicense = JsonConvert.DeserializeObject<ReleaseLicense>(response);
+                if (releaseLicense != null)
+                {
+                    encryptLicenseCode = releaseLicense.EncriptLicense;
+                    publicKey = releaseLicense.PublicKey;
+                }
+            }
+        }
+    }
+
+    public static void SetParameter(string licenseCode, string publickey)
+    {
+        hostMachine = Environment.MachineName;
+        appName = Assembly.GetEntryAssembly()?.GetName()?.Name;
         encryptLicenseCode = licenseCode;
-        companyName = company;
-        appName = app;
+        publicKey = publickey;
     }
 
     public static void CheckLicense(string? encryptLicene)
     {
         if (encryptLicene is null) { throwRandomException(); }
-        var licenseStr = RSAHelper.PublicKeyDecrypt(RSAHelper.PublicKey, encryptLicene!);
+        var licenseStr = RSAHelper.PublicKeyDecrypt(publicKey, encryptLicene!);
         var license = JsonConvert.DeserializeObject<License>(licenseStr);
-        if (license == null || license.Company != companyName || license.AppName != appName || license.ExpiredDate == default)
+        if (license == null || license.HostMachine != hostMachine || license.AppName != appName || license.ExpiredUtcTime == default)
         { throwRandomException(); }
-        var balanceDays = (license!.ExpiredDate.Date - DateTime.Now.Date).TotalDays;
+        var balanceDays = (license!.ExpiredUtcTime.Date - DateTime.Now.Date).TotalDays;
         if (NeedToBreakApp((int)balanceDays, 10))
         {
             throwRandomException();
@@ -72,7 +104,24 @@ public static class LicenceHelper
 
 public class License
 {
-    public string Company { get; set; } = string.Empty;
+    public int Id { get; set; }
+
+    public string HostMachine { get; set; } = string.Empty;
     public string AppName { get; set; } = string.Empty;
-    public DateTime ExpiredDate { get; set; }
+    public bool IsDebug { get; set; }
+    public DateTime ExpiredUtcTime { get; set; }
+    public DateTime CreatedUtcTime { get; set; }
+}
+
+public class ReleaseLicense
+{
+    public string PublicKey { get; set; } = default!;
+    public string EncriptLicense { get; set; } = default!;
+}
+
+public class RequestBody
+{
+    public string HostMachine { get; set; } = string.Empty;
+    public string AppName { get; set; } = string.Empty;
+    public bool IsDebug { get; set; } = EnvironmentExtension.IsDebug;
 }

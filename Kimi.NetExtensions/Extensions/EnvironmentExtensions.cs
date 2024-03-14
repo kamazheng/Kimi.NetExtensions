@@ -3,11 +3,6 @@ using System.Security.Claims;
 
 public static class EnvironmentExtension
 {
-    static EnvironmentExtension()
-    {
-        LicenceHelper.CheckLicense();
-    }
-
     public static bool IsDebug
     {
         get
