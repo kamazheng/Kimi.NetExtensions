@@ -58,9 +58,9 @@ public static class LicenceHelper
 
     private static void getReleasedLicenseFromLocal()
     {
-        var pkey = ConfigReader.GetConfigValue("ReleaseLicense:PublicKey");
-        publicKey = pkey ?? publicKey;
-        encryptLicenseCode = ConfigReader.GetConfigValue("ReleaseLicense:EncriptLicense");
+        var releaseLicense = ConfigReader.GetSettings<ReleaseLicense>();
+        publicKey = releaseLicense?.PublicKey ?? publicKey;
+        encryptLicenseCode = releaseLicense?.EncriptLicense;
     }
 
     public static void SetParameterByServerByLicenseCode(string licenseCode)

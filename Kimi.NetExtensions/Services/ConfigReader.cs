@@ -26,4 +26,10 @@ public static class ConfigReader
     {
         return GetConfigReader().GetConnectionString(name);
     }
+
+    public static T? GetSettings<T>()
+    {
+        var section = Configuration.GetSection(typeof(T).Name);
+        return section.Get<T>();
+    }
 }

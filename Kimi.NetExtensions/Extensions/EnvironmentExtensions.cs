@@ -3,25 +3,20 @@ using System.Security.Claims;
 
 public static class EnvironmentExtension
 {
+    /// <summary>
+    /// To check enviroments is debug or not. Need to SetEnvironmentVariable first.
+    /// </summary>
     public static bool IsDebug
     {
         get
         {
-#if DEBUG
-            return true;
-#else
-                return false;
-#endif
+            return Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == Environments.Development;
         }
     }
 
-    public static void SetEnvironmentVariable()
+    public static void SetEnvironmentVariable(bool isDebug)
     {
-#if DEBUG
-        Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", Environments.Development);
-#else
-            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", Environments.Production);
-#endif
+        Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", isDebug ? Environments.Development : Environments.Production);
     }
 
     /// <summary>
