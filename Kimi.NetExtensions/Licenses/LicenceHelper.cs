@@ -7,14 +7,20 @@ public static class LicenceHelper
     private static string? encryptLicenseCode;
     private static string? hostMachine;
     private static string? appName;
-    private static string? publicKey;
+
+    private static DateTime lstCheckTime = DateTime.MinValue;
+
+    private static string publicKey { get; set; } = """
+        <RSAKeyValue><Modulus>mlFF55YRO8o/IYyfU8t9m53JkFR5UKgek5CuL5WZ9tcup2A4m+VokFiWmoiBrt9u/o/FIcmyVstcWB0T+TMX8zVIijVKzf4M9PlOOKe7dXdqOGujhufzu34Mj5MC1B2OYcygHuIrD7fyAw2B/H0hPEi1cJ91RP8akQ2bV7i95m0=</Modulus><Exponent>AQAB</Exponent></RSAKeyValue>
+        """;
+
     private static string? licenseServer;
 
     /// <summary>
     ///
     /// </summary>
     /// <param name="_licenseServer"></param>
-    public static void SetParameter(string? _licenseServer = null)
+    public static void SetParameterByServer(string? _licenseServer = null)
     {
         hostMachine = Environment.MachineName;
         appName = Assembly.GetEntryAssembly()?.GetName()?.Name;
@@ -41,21 +47,30 @@ public static class LicenceHelper
                 if (releaseLicense != null)
                 {
                     encryptLicenseCode = releaseLicense.EncriptLicense;
-                    publicKey = releaseLicense.PublicKey;
                 }
+            }
+            else
+            {
+                getReleasedLicenseFromLocal();
             }
         }
     }
 
-    public static void SetParameter(string licenseCode, string publickey)
+    private static void getReleasedLicenseFromLocal()
+    {
+        var pkey = ConfigReader.GetConfigValue("ReleaseLicense:PublicKey");
+        publicKey = pkey ?? publicKey;
+        encryptLicenseCode = ConfigReader.GetConfigValue("ReleaseLicense:EncriptLicense");
+    }
+
+    public static void SetParameterByServerByLicenseCode(string licenseCode)
     {
         hostMachine = Environment.MachineName;
         appName = Assembly.GetEntryAssembly()?.GetName()?.Name;
         encryptLicenseCode = licenseCode;
-        publicKey = publickey;
     }
 
-    public static void CheckLicense(string? encryptLicene)
+    private static void CheckLicense(string? encryptLicene)
     {
         if (encryptLicene is null) { throwRandomException(); }
         var licenseStr = RSAHelper.PublicKeyDecrypt(publicKey, encryptLicene!);
@@ -84,7 +99,15 @@ public static class LicenceHelper
 
     public static void CheckLicense()
     {
+        if (DateTime.UtcNow.Subtract(lstCheckTime).TotalHours > 6)
+        {
+            if (!string.IsNullOrEmpty(licenseServer))
+            {
+                GetReleasedLicense();
+            }
+        }
         CheckLicense(encryptLicenseCode);
+        lstCheckTime = DateTime.UtcNow;
     }
 
     static bool NeedToBreakApp(int balanceDays, int expandDays)

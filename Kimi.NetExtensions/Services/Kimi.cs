@@ -11,7 +11,7 @@ namespace Kimi.NetExtensions.Services
         /// </param>
         public static void UseKimiExtension(this IServiceCollection services)
         {
-            LicenceHelper.SetParameter();
+            LicenceHelper.SetParameterByServer();
         }
     }
 }
