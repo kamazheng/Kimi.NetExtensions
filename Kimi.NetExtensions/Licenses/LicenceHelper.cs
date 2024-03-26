@@ -30,29 +30,39 @@ public static class LicenceHelper
 
     private static void GetReleasedLicense()
     {
-        var postBody = new RequestBody
+        try
         {
-            HostMachine = hostMachine!,
-            AppName = appName!,
-            IsDebug = EnvironmentExtension.IsDebug
-        };
-        using (var client = new HttpClient())
-        {
-            var content = new StringContent(JsonConvert.SerializeObject(postBody), Encoding.UTF8, "application/json");
-            var result = AsyncUtil.RunSync(() => client.PostAsync(licenseServer, content));
-            var response = AsyncUtil.RunSync(() => result.Content.ReadAsStringAsync());
-            if (result.IsSuccessStatusCode)
+            var postBody = new RequestBody
             {
-                var releaseLicense = JsonConvert.DeserializeObject<ReleaseLicense>(response);
-                if (releaseLicense != null)
+                HostMachine = hostMachine!,
+                AppName = appName!,
+                IsDebug = EnvironmentExtension.IsDebug
+            };
+            using (var client = new HttpClient())
+            {
+                var content = new StringContent(JsonConvert.SerializeObject(postBody), Encoding.UTF8, "application/json");
+                var result = AsyncUtil.RunSync(() => client.PostAsync(licenseServer, content));
+                var response = AsyncUtil.RunSync(() => result.Content.ReadAsStringAsync());
+                if (result.IsSuccessStatusCode)
                 {
-                    encryptLicenseCode = releaseLicense.EncriptLicense;
+                    var releaseLicense = JsonConvert.DeserializeObject<ReleaseLicense>(response);
+                    if (releaseLicense != null)
+                    {
+                        encryptLicenseCode = releaseLicense.EncriptLicense;
+                        lstCheckTime = DateTime.UtcNow;
+                    }
+                }
+                else
+                {
+                    getReleasedLicenseFromLocal();
+                    lstCheckTime = DateTime.UtcNow;
                 }
             }
-            else
-            {
-                getReleasedLicenseFromLocal();
-            }
+        }
+        catch (Exception ex)
+        {
+            getReleasedLicenseFromLocal();
+            lstCheckTime = DateTime.UtcNow;
         }
     }
 
