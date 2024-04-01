@@ -39,17 +39,19 @@ public static class EmailService
     /// </returns>
     /// <exception cref="Exception">
     /// </exception>
-    public static async Task Send(Email email, string sendByActualUser)
+    public static async Task Send(Email email, string? sendByActualUser = null)
     {
         if (_smtpServer.IsNullOrEmpty())
         {
             throw new Exception("EmailService.SmtpServer is null");
         }
-#if DEBUG
-        email.Subject = email.Subject + " - " + L.SendEmail_AppDevTest;
-        string devNotif = "<h1>" + L.SendEmail_AppDevTest + "</h1><hr />";
-        email.Body = devNotif + email.Body;
-#endif
+        if (EnvironmentExtension.IsDebug)
+        {
+            email.Subject = email.Subject + " - " + L.SendEmail_AppDevTest;
+            string devNotif = "<h1>" + L.SendEmail_AppDevTest + "</h1><hr />";
+            email.Body = devNotif + email.Body;
+        }
+
         SmtpClient smtp = new SmtpClient(_smtpServer, _smtpPort);
         var emailMessage = new MailMessage(from: email.From, to: string.Join(';', email.To), subject: email.Subject, body: email.Body);
         emailMessage.IsBodyHtml = true;
@@ -62,7 +64,7 @@ public static class EmailService
             emailMessage.Bcc.Add(string.Join(';', email.Bcc));
         }
         string hiddenText = $"""
-                            <div style="display:none;">Sent by: {sendByActualUser} Sent on: {DateTime.UtcNow.ToIsoDateTime()} </div>
+                            <div style="display:none;">Sent by: {sendByActualUser ?? EnvironmentExtension.LoginUserName} Sent on utc time: {DateTime.UtcNow.ToIsoDateTime()} </div>
                             <div style="display:none;">Client Host: {EnvironmentExtension.ClientHost} Client IP: {EnvironmentExtension.ClientIp} </div>
                             """;
         emailMessage.Body += hiddenText;

@@ -19,6 +19,11 @@ public static class EnvironmentExtension
         Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", isDebug ? Environments.Development : Environments.Production);
     }
 
+    public static void SetEnvironment(string environmentName)
+    {
+        Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", environmentName);
+    }
+
     /// <summary>
     /// 这个C#函数获取当前用户的ClaimsPrincipal对象。它首先尝试从AppServicesHelper的HttpContextAccessor属性中获取HttpContext对象，然后从该对象中获取User属性（即当前用户）。 如果无法获取到当前用户，则创建一个新的ClaimsPrincipal对象，其中包含一个表示当前线程用户Environment.UserName的ClaimsIdentity对象，该对象包含一个表示用户名的Claim对象。
     /// </summary>

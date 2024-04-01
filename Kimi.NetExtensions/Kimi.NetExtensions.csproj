@@ -5,6 +5,10 @@
     <Nullable>enable</Nullable>
     <RootNamespace>Kimi.NetExtensions</RootNamespace>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Title>.Net miscellaneous extensions</Title>
+    <PackageTags>.net extensions;</PackageTags>
+    <PackageIcon>Icon.png</PackageIcon>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <NoWarn>1701;1702;1591</NoWarn>
@@ -53,5 +57,11 @@
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>L.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Icon.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
 </Project>
