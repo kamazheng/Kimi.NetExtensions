@@ -6,12 +6,14 @@ public static class ConfigReader
 
     public static IConfigurationRoot GetConfigReader()
     {
-        var environmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-
+        if (string.IsNullOrEmpty(EnvironmentExtension.EnvironmentName))
+        {
+            throw new ArgumentNullException("Please use UseKimiExtension to set the envionmentName");
+        }
         var builder = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
             .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-            .AddJsonFile($"appsettings.{environmentName}.json", optional: true, reloadOnChange: true);
+            .AddJsonFile($"appsettings.{EnvironmentExtension.EnvironmentName}.json", optional: true, reloadOnChange: true);
 
         var configuration = builder.Build();
         return configuration;

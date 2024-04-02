@@ -255,7 +255,7 @@ public static class DbContextExtension
             var returnNotIUserDb = dbContextType != null ? Activator.CreateInstance(dbContextType) as DbContext : null;
             return returnIUserDb ?? returnNotIUserDb;
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             return null;
         }

@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Linq.Expressions;
@@ -210,5 +211,20 @@ public static class PropertyExtentions
             }
         }
         return properties;
+    }
+
+    /// <summary>
+    /// Check if the property of dbcontext entity has conversion
+    /// </summary>
+    /// <param name="property"></param>
+    /// <param name="context"></param>
+    /// <param name="classType"></param>
+    /// <returns></returns>
+    public static bool HasConversion(this PropertyInfo property, DbContext context, Type classType)
+    {
+        var entityType = context.Model.FindEntityType(classType);
+        if (entityType == null) return false;
+        var standardValueProperty = entityType.FindProperty(property.Name);
+        return standardValueProperty?.GetValueConverter() != null;
     }
 }

@@ -5,13 +5,17 @@ namespace Kimi.NetExtensions.Services
     public static class Kimi
     {
         /// <summary>
-        /// Start to use Kimi Extensions
+        /// Init kimi extension.
+        /// Set the current environment name and set the license parameter by server.
         /// </summary>
-        /// <param name="services">
-        /// </param>
-        public static void UseKimiExtension(this IServiceCollection services)
+        /// <param name="services"></param>
+        /// <param name="environmentName"></param>
+        /// <param name="licenseServer"></param>
+        public static void UseKimiExtension(this IServiceCollection services, string environmentName, string? licenseServer = null)
         {
-            LicenceHelper.SetParameterByServer();
+            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", environmentName);
+            EnvironmentExtension.EnvironmentName = environmentName;
+            LicenceHelper.SetParameterByServer(licenseServer);
         }
     }
 }

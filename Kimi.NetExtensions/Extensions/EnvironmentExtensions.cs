@@ -3,6 +3,8 @@ using System.Security.Claims;
 
 public static class EnvironmentExtension
 {
+    public static string? EnvironmentName;
+
     /// <summary>
     /// To check enviroments is debug or not. Need to SetEnvironmentVariable first.
     /// </summary>
@@ -10,13 +12,8 @@ public static class EnvironmentExtension
     {
         get
         {
-            return Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == Environments.Development;
+            return EnvironmentName == Environments.Development;
         }
-    }
-
-    public static void SetEnvironmentVariable(bool isDebug)
-    {
-        Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", isDebug ? Environments.Development : Environments.Production);
     }
 
     public static void SetEnvironment(string environmentName)

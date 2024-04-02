@@ -5,7 +5,10 @@ using System.Reflection;
 
 public static class ExcelService
 {
-    static ExcelService() { LicenceHelper.CheckLicense(); }
+    static ExcelService()
+    {
+        LicenceHelper.CheckLicense();
+    }
 
     /// <summary>
     /// Get excel file for controller downloading
@@ -22,7 +25,7 @@ public static class ExcelService
     }
 
     /// <summary>
-    /// Get raw excel file from list<object>
+    /// Get raw excel file from list of object
     /// </summary>
     /// <param name="list"></param>
     /// <param name="isReadableFieldsOnly"></param>
@@ -42,7 +45,8 @@ public static class ExcelService
         PropertyInfo[] properties = classType.GetProperties();
         if (isReadableFieldsOnly)
         {
-            properties = properties.Where(p => !p.PropertyType.IsClass || p.PropertyType == typeof(string))
+            properties = properties.Where(p => p.IsCollectible)
+                .Where(p => !p.PropertyType.IsClass || p.PropertyType == typeof(string) || p.PropertyType == typeof(object))
                 .Where(p => !p.PropertyType.IsGenericType || !typeof(IEnumerable<>).IsAssignableFrom(p.PropertyType.GetGenericTypeDefinition()))
                 .Where(p => !p.PropertyType.IsGenericType || !typeof(ICollection<>).IsAssignableFrom(p.PropertyType.GetGenericTypeDefinition()))
                 .ToArray();
