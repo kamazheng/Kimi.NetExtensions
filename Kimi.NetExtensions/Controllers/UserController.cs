@@ -53,7 +53,7 @@ public class UserController : Controller
         var md5Pass = SHA.SHAmd5Encrypt(user.password);
         var tableQuery = new TableQuery
         {
-            WhereClause = $"{nameof(Model.Identities.User.LoginId)}=\"{user.username}\" " +
+            WhereClause = $"{nameof(Model.Identities.User.UserId)}=\"{user.username}\" " +
                             $"&& {nameof(Model.Identities.User.Password)}=\"{md5Pass}\"",
             TableClassFullName = typeof(Model.Identities.User).FullName!,
         };
@@ -62,7 +62,7 @@ public class UserController : Controller
 
         if (getUser != null)
         {
-            var userName = getUser?.LoginId;
+            var userName = getUser?.UserId;
             var token = CreateJWT(userName!);
             return Ok(token);
         }

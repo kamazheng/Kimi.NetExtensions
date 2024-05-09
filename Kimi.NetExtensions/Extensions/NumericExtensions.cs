@@ -1,6 +1,4 @@
-﻿using System;
-
-/// <summary>
+﻿/// <summary>
 /// 将双精度数字转换为 humanized 的形式，即以中文或英文表示的可读形式。函数参数 digits 是可选的，表示保留的小数位数。
 /// 如果数字为默认值，则返回默认值。函数通过计算数字的绝对值和使用数学函数来确定数字的量级，并将其转换为 shortNumber。
 /// 然后，根据量级的值返回不同的后缀。如果量级小于0，则返回 "MIN"，如果量级大于12，则返回 "MAX"。最后，将 shortNumber 和后缀连接起来，并返回结果。
@@ -61,5 +59,16 @@ public static class NumericExtensions
     public static bool IsInRange(this double value, decimal min, decimal max, int decimalPlaces)
     {
         return IsInRange((double)value, (double)min, (double)max, decimalPlaces);
+    }
+
+    public static T RoundToPlaces<T>(this T input, int places, MidpointRounding mode = MidpointRounding.AwayFromZero) where T : IConvertible
+    {
+        if (places < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(places), "Decimal places must be non-negative.");
+        }
+
+        double result = Math.Round(Convert.ToDouble(input), places, mode);
+        return (T)Convert.ChangeType(result, typeof(T));
     }
 }

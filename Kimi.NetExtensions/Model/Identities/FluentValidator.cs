@@ -30,7 +30,7 @@ public class RolePermissionValidator : AbstractValidator<RolePermission>
 {
     public RolePermissionValidator()
     {
-        RuleFor(x => x.RoleFk)
+        RuleFor(x => x.RoleId)
             .NotEmpty();
         RuleFor(x => x.PermissionName)
             .NotEmpty();

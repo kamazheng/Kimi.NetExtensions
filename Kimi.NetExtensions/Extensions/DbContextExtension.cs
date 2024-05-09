@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using System.Data;
 using System.Data.Common;
 using System.Linq.Dynamic.Core;
+using System.Reflection;
 using System.Text;
 
 /// <summary>
@@ -472,7 +473,7 @@ public static class DbContextExtension
         }
         if (dto.Fields?.Any() == true)
         {
-            string fieldsString = string.Join(",", dto.Fields.Distinct().Select(s => s + " AS " + s.Replace(".", ""))); //navigation has "." will cause error
+            string fieldsString = string.Join(",", dto.Fields.Distinct().Select(s => s.BuildNullConditionalExpression() + " AS " + s.Replace(".", ""))); //navigation has "." will cause error
             var dynamicResult = (result as IQueryable).Select($"new ({fieldsString})");
             return dynamicResult.Skip((dto.Page - 1) * dto.PageSize).Take(dto.PageSize);
         }
@@ -553,5 +554,31 @@ public static class DbContextExtension
         db.RemoveRange(result);
         await db.SaveChangesAsync();
         return result;
+    }
+
+    public static PropertyInfo[] GetAllNavigations(this DbContext db, Type tableClassType)
+    {
+        var entityType = db.Model.FindEntityType(tableClassType);
+        if (entityType == null) throw new Exception($"{tableClassType.FullName} {L.IsNotCorrectNoDatabaseEntityFound}!");
+        var navigations = entityType.GetNavigations().Select(n => tableClassType.GetProperty(n.Name)).ToArray();
+        return navigations;
+    }
+
+    public static string BuildNullConditionalExpression(this string propertyPath)
+    {
+        if (!propertyPath.Contains(".")) return propertyPath;
+        var properties = propertyPath.Split('.');
+        return BuildExpression(properties, 0);
+    }
+
+    private static string BuildExpression(string[] properties, int index)
+    {
+        if (index == properties.Length - 1)
+        {
+            return $"{String.Join(".", properties, 0, index + 1)} != null ? {String.Join(".", properties, 0, index + 1)} : null";
+        }
+
+        var currentProperty = String.Join(".", properties, 0, index + 1);
+        return $"{currentProperty} != null ? ({BuildExpression(properties, index + 1)}) : null";
     }
 }

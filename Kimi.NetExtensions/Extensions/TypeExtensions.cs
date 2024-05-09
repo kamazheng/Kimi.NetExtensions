@@ -1,7 +1,9 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Resources;
 
 public static class TypeExtensions
 {
@@ -168,6 +170,53 @@ public static class TypeExtensions
         }
     }
 
+    public static bool IsInteger(this Type type)
+    {
+        if (type == null) { return false; }
+
+        if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
+        {
+            type = type.GetGenericArguments()[0];
+        }
+
+        switch (Type.GetTypeCode(type))
+        {
+            case TypeCode.Byte:
+            case TypeCode.SByte:
+            case TypeCode.UInt16:
+            case TypeCode.UInt32:
+            case TypeCode.UInt64:
+            case TypeCode.Int16:
+            case TypeCode.Int32:
+            case TypeCode.Int64:
+                return true;
+
+            default:
+                return false;
+        }
+    }
+
+    public static bool IsDecimal(this Type type)
+    {
+        if (type == null) { return false; }
+
+        if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
+        {
+            type = type.GetGenericArguments()[0];
+        }
+
+        switch (Type.GetTypeCode(type))
+        {
+            case TypeCode.Decimal:
+            case TypeCode.Double:
+            case TypeCode.Single:
+                return true;
+
+            default:
+                return false;
+        }
+    }
+
     public static bool IsBool(this Type type)
     {
         if (type == null) { return false; }
@@ -304,5 +353,39 @@ public static class TypeExtensions
             }
         }
         return "";
+    }
+
+    public static FieldInfo? GetPrivateField(this Type? t, string name)
+    {
+        const BindingFlags bf = BindingFlags.Instance |
+                                BindingFlags.NonPublic |
+                                BindingFlags.DeclaredOnly;
+        FieldInfo? fi = null;
+        while ((fi == null) && (t != null))
+        {
+            fi = t.GetField(name, bf);
+            t = t.BaseType;
+        }
+        return fi;
+    }
+
+    public static bool IsNullable(this Type type)
+    {
+        return type.IsValueType && Nullable.GetUnderlyingType(type) != null;
+    }
+
+    public static string GetDisplayLabel(this Type type)
+    {
+        DisplayAttribute? displayAttr = (DisplayAttribute?)type.GetCustomAttributes(false).FirstOrDefault(a => a.GetType() == typeof(DisplayAttribute));
+        if (displayAttr != null)
+        {
+            var resourceManager = displayAttr.ResourceType != null ? new ResourceManager(displayAttr.ResourceType) : null;
+            var culture = CultureInfo.CurrentUICulture;
+            return resourceManager?.GetString(displayAttr.Name!, culture) ?? displayAttr.Name!;
+        }
+        else
+        {
+            return type.Name;
+        }
     }
 }

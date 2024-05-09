@@ -1,4 +1,5 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using Kimi.NetExtensions.Services;
+using Microsoft.Data.SqlClient;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Globalization;
@@ -173,7 +174,7 @@ public static class StringExtentions
         return classType;
     }
 
-    public static int? ToNullableInt(this string s)
+    public static int? ToNullableInt(this string? s)
     {
         int i;
         if (int.TryParse(s, out i)) return i;
@@ -295,10 +296,26 @@ public static class StringExtentions
         Double.TryParse(inputString, out var doubleResult);
         return doubleResult;
     }
+
     public static bool IsTrustedConnection(this string? connectionString)
     {
         SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder(connectionString);
 
         return builder.IntegratedSecurity;
+    }
+
+    public static string KeepAlphaNumeric(this string input)
+    {
+        if (string.IsNullOrEmpty(input))
+            return input;
+
+        // 使用正则表达式匹配并保留字母和数字
+        string cleaned = System.Text.RegularExpressions.Regex.Replace(input, @"[^a-zA-Z0-9]", "");
+        return cleaned;
+    }
+
+    public static string ToMD5(this string input)
+    {
+        return SHA.SHAmd5Encrypt(input);
     }
 }

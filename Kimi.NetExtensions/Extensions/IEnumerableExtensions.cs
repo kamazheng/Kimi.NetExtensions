@@ -1,11 +1,17 @@
-﻿
-public static class IEnumerableExtension
+﻿namespace Kimi.NetExtensions.Extensions;
+
+public static class IEnumerableExtensions
 {
-    static IEnumerableExtension() { LicenceHelper.CheckLicense(); }
+    static IEnumerableExtensions()
+    {
+        LicenceHelper.CheckLicense();
+    }
+
     public static bool HasItem<T>(this IEnumerable<T>? enumerable)
     {
         return enumerable?.Any() == true;
     }
+
     /// <summary>
     /// 这个C#函数使用多任务处理技术来遍历一个列表中的每个元素，并对每个元素执行一个给定的操作。
     /// 它将列表分成多个子列表，并为每个子列表创建一个任务。任务在后台线程中运行，然后等待所有任务完成。最后，它释放任务的资源并清空任务列表。
@@ -31,12 +37,12 @@ public static class IEnumerableExtension
         {
             var taskItems = totalItems.Skip(i * eachTaskItems).Take(eachTaskItems).ToList();
             var t = Task.Run(() =>
+            {
+                foreach (var item in taskItems)
                 {
-                    foreach (var item in taskItems)
-                    {
-                        taskToRun(item);
-                    }
+                    taskToRun(item);
                 }
+            }
             );
             tasks.Add(t);
         }
@@ -44,4 +50,25 @@ public static class IEnumerableExtension
         tasks.ForEach((e) => e.Dispose());
     }
 
+    public static IEnumerable<T> OrEmptyIfNull<T>(this IEnumerable<T>? source)
+    {
+        return source ?? Enumerable.Empty<T>().ToList();
+    }
+
+    public static bool HasDuplicates<T>(this IEnumerable<T> list)
+    {
+        return list.GroupBy(x => x).Any(x => x.Skip(1).Any());
+    }
+
+    public static IEnumerable<T> FindUniqueItems<T>(IEnumerable<T> firstSequence, IEnumerable<T> secondSequence)
+       where T : class
+    {
+        // 找出firstSequence中有而secondSequence中没有的项
+        var uniqueToFirstSequence = firstSequence.Except(secondSequence).ToList();
+        // 找出secondSequence中有而firstSequence中没有的项
+        var uniqueToSecondSequence = secondSequence.Except(firstSequence).ToList();
+
+        // 合并两个序列中的独特项
+        return uniqueToFirstSequence.Union(uniqueToSecondSequence);
+    }
 }

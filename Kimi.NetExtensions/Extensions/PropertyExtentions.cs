@@ -102,17 +102,17 @@ public static class PropertyExtentions
         return property.GetDisplayLabel();
     }
 
-    public static string? GetDisplayLabel(this PropertyInfo property)
+    public static string GetDisplayLabel(this PropertyInfo property)
     {
         if (property == null)
         {
-            return default;
+            throw new ArgumentNullException(nameof(property));
         }
         if (property.GetAttributeIncludingMetadata(typeof(DisplayAttribute)) is DisplayAttribute displayAttr
             && !string.IsNullOrEmpty(displayAttr.Name))
         {
             var resourceManager = displayAttr.ResourceType != null ? new ResourceManager(displayAttr.ResourceType) : null;
-            var culture = CultureInfo.CurrentCulture;
+            var culture = CultureInfo.CurrentUICulture;
             return resourceManager?.GetString(displayAttr.Name, culture) ?? displayAttr.Name;
         }
         else
@@ -211,6 +211,12 @@ public static class PropertyExtentions
             }
         }
         return properties;
+    }
+
+    public static IEnumerable<PropertyInfo> ExculdeInterfaceProperty<Interface>(this IEnumerable<PropertyInfo> properties)
+    {
+        var interfaceProperpties = (typeof(Interface)).GetProperties();
+        return properties.Where(p => interfaceProperpties.All(i => i.Name != p.Name)).ToArray();
     }
 
     /// <summary>

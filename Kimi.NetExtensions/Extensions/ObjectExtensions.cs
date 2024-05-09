@@ -49,6 +49,12 @@ public static class ObjectExtensions
     {
         return JsonConvert.SerializeObject(obj, jsonSetting);
     }
+
+    public static T? FromJson<T>(this string jsonString)
+    {
+        return JsonConvert.DeserializeObject<T>(jsonString, jsonSetting);
+    }
+
     public static T? JsonCopy<T>(this object? obj)
     {
         return JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(obj, jsonSetting), jsonSetting);

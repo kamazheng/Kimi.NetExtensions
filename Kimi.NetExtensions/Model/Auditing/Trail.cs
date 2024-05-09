@@ -14,26 +14,29 @@ public class Trail : ISoftDeleteEntity, IReadAccessEntity
 
     public string UserId { get; set; } = string.Empty;
 
-    [StringLength(50)]
+    [MaxLength(50)]
     public string? Type { get; set; }
 
-    [StringLength(100)]
+    [MaxLength(100)]
     public string? TableName { get; set; }
 
     [Precision(3)]
     public DateTime AuditOn { get; set; }
 
+    [MaxLength(-1)]
     public string? OldValues { get; set; }
+
+    [MaxLength(-1)]
     public string? NewValues { get; set; }
 
-    [StringLength(500)]
+    [MaxLength(500)]
     public string? AffectedColumns { get; set; }
 
-    [StringLength(100)]
+    [MaxLength(100)]
     public string? PrimaryKey { get; set; }
 
     [Column("UPDATEDBY")]
-    [StringLength(50)]
+    [MaxLength(50)]
     public string Updatedby { get; set; } = null!;
 
     [Column("UPDATED")]

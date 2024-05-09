@@ -3,26 +3,27 @@ using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-[Index(nameof(Name), nameof(Updated), nameof(Updatedby))]
-public abstract class BaseOject : IBaseOject, ISoftDeleteEntity
+namespace Kimi.NetExtensions.Model;
+
+[Index(nameof(Updated), nameof(Updatedby))]
+public abstract partial class BaseObject : IBaseOject, ISoftDeleteEntity
 {
     [Column(nameof(Id), Order = 1)]
     [Key]
     public int Id { get; set; }
 
-    [Required]
-    [StringLength(50)]
+    [MaxLength(256)]
     [Column(nameof(Name), Order = 2)]
     [Display(Name = nameof(Name), ResourceType = typeof(L))]
     public string Name { get; set; } = String.Empty;
 
-    [StringLength(200)]
+    [MaxLength(512)]
     [Column(nameof(Description), Order = 3)]
     [Display(Name = nameof(Description), ResourceType = typeof(L))]
     public string? Description { get; set; } = string.Empty;
 
     [Column("UPDATEDBY", Order = int.MaxValue - 2)]
-    [StringLength(50)]
+    [MaxLength(50)]
     [Display(Name = nameof(Updatedby), ResourceType = typeof(L))]
     public string Updatedby { get; set; } = string.Empty;
 

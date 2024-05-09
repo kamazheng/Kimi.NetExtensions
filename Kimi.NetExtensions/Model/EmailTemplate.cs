@@ -13,37 +13,38 @@ public partial class EmailTemplate : ISoftDeleteEntity, IWriteAccessEntity, IRea
     public int EmailTemplatePk { get; set; }
 
     [Required]
-    [StringLength(50)]
+    [MaxLength(50)]
     [Display(Name = "Name", ResourceType = typeof(L))]
     public string Name { get; set; } = string.Empty;
 
-    [StringLength(500)]
+    [MaxLength(500)]
     [Display(Name = "Remark", ResourceType = typeof(L))]
     public string? Remark { get; set; }
 
     [Required]
-    [StringLength(500)]
+    [MaxLength(500)]
     [Display(Name = "Subject", ResourceType = typeof(L))]
     public string Subject { get; set; } = string.Empty;
 
     [Required]
-    [StringLength(2000)]
+    [MaxLength(4000)]
     [Unicode(false)]
     [Display(Name = "ToList", ResourceType = typeof(L))]
     public string ToList { get; set; } = string.Empty;
 
     [Column("CCList")]
-    [StringLength(1000)]
+    [MaxLength(1000)]
     [Unicode(false)]
     [Display(Name = "Cclist", ResourceType = typeof(L))]
     public string? Cclist { get; set; }
 
     [Required]
+    [MaxLength(-1)]
     [Display(Name = "TemplateHtml", ResourceType = typeof(L))]
     public string? TemplateHtml { get; set; }
 
     [Column("UPDATEDBY")]
-    [StringLength(50)]
+    [MaxLength(50)]
     public string Updatedby { get; set; } = string.Empty;
 
     [Column("UPDATED")]
