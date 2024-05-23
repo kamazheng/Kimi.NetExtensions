@@ -12,6 +12,22 @@ public static class IEnumerableExtensions
         return enumerable?.Any() == true;
     }
 
+    public static void AddIfNotExistsByJson<T>(this List<T> list, T item)
+    {
+        if (!list.Any(i => i.ToJson() == item.ToJson()))
+        {
+            list.Add(item);
+        }
+    }
+    public static IEnumerable<T> AddIfNotExistsByJson<T>(this IEnumerable<T> source, T item)
+    {
+        if (!source.Any(i => i.ToJson() == item.ToJson()))
+        {
+            return source.Concat(new[] { item });
+        }
+        return source;
+    }
+
     /// <summary>
     /// 这个C#函数使用多任务处理技术来遍历一个列表中的每个元素，并对每个元素执行一个给定的操作。
     /// 它将列表分成多个子列表，并为每个子列表创建一个任务。任务在后台线程中运行，然后等待所有任务完成。最后，它释放任务的资源并清空任务列表。
@@ -70,5 +86,41 @@ public static class IEnumerableExtensions
 
         // 合并两个序列中的独特项
         return uniqueToFirstSequence.Union(uniqueToSecondSequence);
+    }
+
+    public static List<Dictionary<string, object?>> ToDictionaryList<T>(this IEnumerable<T> list)
+    {
+        return list.Select(a => a.GetType().GetProperties().ToDictionary(
+            prop => prop.Name,
+            prop => prop.GetValue(a, null)))
+        .ToList();
+    }
+
+    public static void OverrideDictionary(this List<Dictionary<string, object?>> targetDicts, List<Dictionary<string, object?>> fromDicts,
+        string identityKey,
+        params string[] overrideKeys)
+    {
+        // Iterate over the target dictionary list
+        foreach (var targetDict in targetDicts)
+        {
+            if (targetDict.TryGetValue(identityKey, out object? targetId))
+            {
+                // Find the matching dictionary in the source list based on the identity key
+                var fromDict = fromDicts.FirstOrDefault(d => d.ContainsKey(identityKey)
+                    && d[identityKey].ToString()?.Equals(targetId.ToString()) == true
+                    );
+                if (fromDict != null)
+                {
+                    // Override the specified keys
+                    foreach (var key in overrideKeys)
+                    {
+                        if (fromDict.TryGetValue(key, out object? value))
+                        {
+                            targetDict[key] = value;
+                        }
+                    }
+                }
+            }
+        }
     }
 }

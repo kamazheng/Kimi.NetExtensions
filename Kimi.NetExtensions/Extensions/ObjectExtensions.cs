@@ -1,4 +1,5 @@
-﻿using Kimi.NetExtensions.Interfaces;
+﻿using Kimi.NetExtensions.Extensions;
+using Kimi.NetExtensions.Interfaces;
 using Newtonsoft.Json;
 
 public static class ObjectExtensions
@@ -6,7 +7,7 @@ public static class ObjectExtensions
     public static JsonSerializerSettings jsonSetting = new JsonSerializerSettings()
     {
         ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-        TypeNameHandling = TypeNameHandling.None
+        TypeNameHandling = TypeNameHandling.Objects,
     };
 
     static ObjectExtensions()
@@ -48,6 +49,21 @@ public static class ObjectExtensions
     public static string ToJson<T>(this T obj)
     {
         return JsonConvert.SerializeObject(obj, jsonSetting);
+    }
+
+    public static string ToJson<T>(this T obj, int maxDepth)
+    {
+        using (var strWriter = new StringWriter())
+        {
+            using (var jsonWriter = new CustomJsonTextWriter(strWriter))
+            {
+                Func<bool> include = () => jsonWriter.CurrentDepth <= maxDepth;
+                var resolver = new CustomContractResolver(include);
+                var serializer = new JsonSerializer { ContractResolver = resolver };
+                serializer.Serialize(jsonWriter, obj);
+            }
+            return strWriter.ToString();
+        }
     }
 
     public static T? FromJson<T>(this string jsonString)

@@ -283,7 +283,14 @@ public static class StringExtentions
 
     public static T? ToType<T>(this string jsonString)
     {
-        return JsonConvert.DeserializeObject<T>(jsonString);
+        if (jsonString.IsValidJson())
+        {
+            return JsonConvert.DeserializeObject<T>(jsonString);
+        }
+        else
+        {
+            return default(T);
+        }
     }
 
     public static object? ToType(this string jsonString, Type type)
@@ -311,6 +318,16 @@ public static class StringExtentions
 
         // 使用正则表达式匹配并保留字母和数字
         string cleaned = System.Text.RegularExpressions.Regex.Replace(input, @"[^a-zA-Z0-9]", "");
+        return cleaned;
+    }
+
+    public static string KeepAlpha(this string input)
+    {
+        if (string.IsNullOrEmpty(input))
+            return input;
+
+        // 使用正则表达式匹配并保留字母
+        string cleaned = System.Text.RegularExpressions.Regex.Replace(input, @"[^a-zA-Z]", "");
         return cleaned;
     }
 

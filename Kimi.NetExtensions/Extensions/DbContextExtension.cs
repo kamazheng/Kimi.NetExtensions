@@ -473,7 +473,7 @@ public static class DbContextExtension
         }
         if (dto.Fields?.Any() == true)
         {
-            string fieldsString = string.Join(",", dto.Fields.Distinct().Select(s => s.BuildNullConditionalExpression() + " AS " + s.Replace(".", ""))); //navigation has "." will cause error
+            string fieldsString = string.Join(",", dto.Fields.Distinct().Select(s => s.BuildNullConditionalExpression() + " AS " + s.KeepAlphaNumeric())); //navigation has "." will cause error
             var dynamicResult = (result as IQueryable).Select($"new ({fieldsString})");
             return dynamicResult.Skip((dto.Page - 1) * dto.PageSize).Take(dto.PageSize);
         }
@@ -566,7 +566,9 @@ public static class DbContextExtension
 
     public static string BuildNullConditionalExpression(this string propertyPath)
     {
+        var ignoreIfContains = new[] { "Select", "Distinct", "Where", "GroupBy", "Min", "Max", "=>" };
         if (!propertyPath.Contains(".")) return propertyPath;
+        if (ignoreIfContains.Any(i => propertyPath.Contains(i))) return propertyPath;
         var properties = propertyPath.Split('.');
         return BuildExpression(properties, 0);
     }
