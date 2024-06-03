@@ -71,4 +71,32 @@ public static class NumericExtensions
         double result = Math.Round(Convert.ToDouble(input), places, mode);
         return (T)Convert.ChangeType(result, typeof(T));
     }
+    public static decimal? RoundToPlaces(this decimal? input, int places, MidpointRounding mode = MidpointRounding.AwayFromZero)
+    {
+        if (places < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(places), "Decimal places must be non-negative.");
+        }
+        if (input.HasValue)
+        {
+            decimal? result = Math.Round(input.Value, places, mode);
+            return result;
+        }
+        else
+        {
+            return input;
+        }
+    }
+
+    public static double ToDouble(this decimal? input)
+    {
+        if (input.HasValue)
+        {
+            return (double)input.Value;
+        }
+        else
+        {
+            return 0;
+        }
+    }
 }

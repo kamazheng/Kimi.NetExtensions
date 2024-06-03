@@ -1,7 +1,9 @@
-﻿
-public static class DateTimeExtensions
+﻿public static class DateTimeExtensions
 {
-    static DateTimeExtensions() { LicenceHelper.CheckLicense(); }
+    static DateTimeExtensions()
+    {
+        LicenceHelper.CheckLicense();
+    }
 
     private static readonly DateTime Epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
@@ -28,5 +30,29 @@ public static class DateTimeExtensions
     public static long ToUnixTimeMilliseconds(this DateTime date)
     {
         return (long)(date.ToUniversalTime() - Epoch).TotalMilliseconds;
+    }
+
+    public static DateTime ReplaceDate(this DateTime? input, DateTime? newDay)
+    {
+        if (input.HasValue && newDay.HasValue)
+        {
+            return new DateTime(newDay.Value.Year, newDay.Value.Month, newDay.Value.Day, input.Value.Hour, input.Value.Minute, input.Value.Second, input.Value.Millisecond);
+        }
+        else
+        {
+            return input ?? DateTime.MinValue;
+        }
+    }
+
+    public static DateTime ReplaceTime(this DateTime? input, DateTime? newTime)
+    {
+        if (input.HasValue && newTime.HasValue)
+        {
+            return new DateTime(input.Value.Year, input.Value.Month, input.Value.Day, newTime.Value.Hour, newTime.Value.Minute, newTime.Value.Second, newTime.Value.Millisecond);
+        }
+        else
+        {
+            return input ?? DateTime.MinValue;
+        }
     }
 }

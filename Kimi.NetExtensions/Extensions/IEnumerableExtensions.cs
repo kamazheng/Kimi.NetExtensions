@@ -19,13 +19,18 @@ public static class IEnumerableExtensions
             list.Add(item);
         }
     }
+
     public static IEnumerable<T> AddIfNotExistsByJson<T>(this IEnumerable<T> source, T item)
     {
-        if (!source.Any(i => i.ToJson() == item.ToJson()))
+        var existingItems = new HashSet<string>(source.Select(i => i.ToJson()));
+        var itemJson = item.ToJson();
+
+        if (!existingItems.Contains(itemJson))
         {
             return source.Concat(new[] { item });
         }
-        return source;
+
+        return source; // Item already exists, return the original collection
     }
 
     /// <summary>

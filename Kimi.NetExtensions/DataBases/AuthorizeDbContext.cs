@@ -10,6 +10,8 @@ using System.Linq.Expressions;
 /// </summary>
 public class AuthorizeDbContext : BaseDbContext
 {
+    private static string ProxyNameSpace = "Castle.Proxies";
+
     public AuthorizeDbContext(IUser user) : base(user)
     {
         LicenceHelper.CheckLicense();
@@ -37,8 +39,13 @@ public class AuthorizeDbContext : BaseDbContext
     {
         foreach (var entry in ChangeTracker.Entries<IWriteAccessEntity>().ToList())
         {
-            var tableName = entry.Entity.GetType().FullName;
-            if (!DbUser.CanWriteTable(tableName!))
+            var tableType = entry.Entity.GetType();
+            if (tableType.Namespace == ProxyNameSpace)
+            {
+                tableType = tableType.BaseType;
+            }
+            var tableName = tableType.FullName;
+            if (entry.State != EntityState.Unchanged && !DbUser.CanWriteTable(tableName!))
             {
                 var errorMsg = $"{DbUser?.UserName} {L.NotAuthorized} WRITE TABLE {tableName}";
                 throw new Exception(errorMsg);

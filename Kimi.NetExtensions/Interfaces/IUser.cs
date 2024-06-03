@@ -16,7 +16,10 @@ public interface IUser
     bool CanReadTable(string tableFullName);
 
     bool CanWriteTable(string tableFullName);
+
     void ResetUser();
+
+    bool IsRole(string role);
 }
 
 public class SysUser : IUser
@@ -46,6 +49,11 @@ public class SysUser : IUser
     }
 
     public void ResetUser()
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool IsRole(string role)
     {
         throw new NotImplementedException();
     }

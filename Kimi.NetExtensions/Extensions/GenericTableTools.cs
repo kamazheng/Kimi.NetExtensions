@@ -3,6 +3,7 @@ using Kimi.NetExtensions.Interfaces;
 using Kimi.NetExtensions.Localization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using NPOI.SS.UserModel;
 using System.Linq.Dynamic.Core;
@@ -40,15 +41,36 @@ public static class GenericTableTools
         return await Task.Run(() => GetItems(tableQuery, user));
     }
 
+    public static async Task<ObjectResult> GetItemsAsync(TableQuery tableQuery, DbContext db)
+    {
+        return await Task.Run(() => GetItems(tableQuery, db));
+    }
+
     public static ObjectResult GetItems(TableQuery tableQuery, IUser? user = null)
     {
-        var aa = JsonConvert.SerializeObject(tableQuery);
         if (string.IsNullOrEmpty(tableQuery?.TableClassFullName))
         {
             return new BadRequestObjectResult(L.TableFullnameCannotBeNull);
         }
 
         var result = DbContextExtension.GetDbRecordsByDynamicLinq(tableQuery, user);
+        var json = JsonConvert.SerializeObject(result);
+        if (json.Contains("AnonymousType"))
+        {
+            var noTypeResult = JsonConvert.SerializeObject(result.ToDynamicList<object>(), new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.None });
+            return new OkObjectResult(noTypeResult);
+        }
+        return new OkObjectResult(json);
+    }
+
+    public static ObjectResult GetItems(TableQuery tableQuery, DbContext db)
+    {
+        if (string.IsNullOrEmpty(tableQuery?.TableClassFullName))
+        {
+            return new BadRequestObjectResult(L.TableFullnameCannotBeNull);
+        }
+
+        var result = DbContextExtension.GetDbRecordsByDynamicLinq(tableQuery, db);
         var json = JsonConvert.SerializeObject(result);
         if (json.Contains("AnonymousType"))
         {
@@ -73,6 +95,11 @@ public static class GenericTableTools
         return await Task.Run(() => GetItemsByFilter<T>(filter, user));
     }
 
+    public static async Task<List<T>?> GetItemsByFilterAsync<T>(string filter, DbContext db)
+    {
+        return await Task.Run(() => GetItemsByFilter<T>(filter, db));
+    }
+
     public static List<T>? GetItemsByFilter<T>(string filter, IUser? user = null)
     {
         var result = DbContextExtension.GetDbRecordsByDynamicLinq(new TableQuery
@@ -80,6 +107,16 @@ public static class GenericTableTools
             WhereClause = filter,
             TableClassFullName = typeof(T).FullName!
         }, user);
+        return result.ToDynamicList<T>();
+    }
+
+    public static List<T>? GetItemsByFilter<T>(string filter, DbContext db)
+    {
+        var result = DbContextExtension.GetDbRecordsByDynamicLinq(new TableQuery
+        {
+            WhereClause = filter,
+            TableClassFullName = typeof(T).FullName!
+        }, db);
         return result.ToDynamicList<T>();
     }
 
@@ -109,6 +146,7 @@ public static class GenericTableTools
             return default;
         }
     }
+
     public static object? GetItem(object id, Type tableClassType, IUser? user = null)
     {
         var result = DbContextExtension.GetItem(new RecordQuery
@@ -261,6 +299,21 @@ public static class GenericTableTools
         return file;
     }
 
+    public static async Task<FileContentResult> ExportExcelAsync(TableQuery tableQuery, DbContext db)
+    {
+        if (string.IsNullOrEmpty(tableQuery?.TableClassFullName))
+        {
+            throw new Exception(L.TableFullnameCannotBeNull);
+        }
+
+        var result = await Task.Run(() => DbContextExtension
+            .GetDbRecordsByDynamicLinq(tableQuery, db)
+            .ToDynamicList<object>());
+        var fileName = $"{tableQuery?.TableClassFullName}.xlsx";
+        var file = await Task.Run(() => ExcelService.GetExcelFile(result, fileName));
+        return file;
+    }
+
     /// <summary>
     /// Import table records from excel, empty primary key is insert, otherwise is update
     /// </summary>
@@ -303,6 +356,26 @@ public static class GenericTableTools
         {
             return new BadRequestObjectResult($"{L.DatabaseNotFound} <= {tableFullName}");
         }
+        foreach (var item in objectList)
+        {
+            await dbContext.UpsertWithoutSaveAsync(item);
+        }
+        await dbContext.SaveChangesAsync();
+
+        return new OkObjectResult(L.Success);
+    }
+
+    public static async Task<ObjectResult> ImportExcelAsync(string tableFullName, Stream stream, DbContext dbContext)
+    {
+        var workbook = WorkbookFactory.Create(stream);
+        var tableType = tableFullName.GetClassType();
+        if (tableType == null)
+        {
+            return new BadRequestObjectResult($"{L.TableNotFound} {tableFullName}");
+        }
+
+        ISheet sheet = workbook.GetSheetAt(0);
+        var objectList = sheet.GetList(tableType);
         foreach (var item in objectList)
         {
             await dbContext.UpsertWithoutSaveAsync(item);

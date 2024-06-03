@@ -1,5 +1,7 @@
 ﻿using Kimi.NetExtensions.Extensions;
 using Kimi.NetExtensions.Interfaces;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure.Internal;
 using Newtonsoft.Json;
 
 public static class ObjectExtensions
@@ -32,26 +34,30 @@ public static class ObjectExtensions
 
     public static T? JsonCopy<T>(this T? obj)
     {
-        var js = JsonConvert.SerializeObject(obj, jsonSetting);
-        return JsonConvert.DeserializeObject<T>(js, jsonSetting);
+        return DisableLazyLoading<T>(obj, () => JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(obj)));
     }
 
     public static object? JsonCopy(this object? obj, Type type)
     {
-        return JsonConvert.DeserializeObject(JsonConvert.SerializeObject(obj, jsonSetting), type, jsonSetting);
+        return DisableLazyLoading<object>(obj, () => JsonConvert.DeserializeObject(JsonConvert.SerializeObject(obj, jsonSetting), type, jsonSetting));
     }
 
     public static object? JsonCopy(this object obj)
     {
-        return JsonConvert.DeserializeObject(JsonConvert.SerializeObject(obj, jsonSetting), obj.GetType());
+        return DisableLazyLoading<object>(obj, () => JsonConvert.DeserializeObject(JsonConvert.SerializeObject(obj, jsonSetting), obj.GetType()));
     }
 
-    public static string ToJson<T>(this T obj)
+    public static string ToJson(this object obj)
     {
-        return JsonConvert.SerializeObject(obj, jsonSetting);
+        return DisableLazyLoading<string>(obj, () => JsonConvert.SerializeObject(obj, jsonSetting));
     }
 
-    public static string ToJson<T>(this T obj, int maxDepth)
+    public static string ToJson(this object obj, int maxDepth)
+    {
+        return DisableLazyLoading<string>(obj, () => ToJsonWithMaxDepth(obj, maxDepth));
+    }
+
+    private static string ToJsonWithMaxDepth(this object obj, int maxDepth)
     {
         using (var strWriter = new StringWriter())
         {
@@ -73,7 +79,7 @@ public static class ObjectExtensions
 
     public static T? JsonCopy<T>(this object? obj)
     {
-        return JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(obj, jsonSetting), jsonSetting);
+        return DisableLazyLoading<T>(obj, () => JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(obj, jsonSetting), jsonSetting));
     }
 
     public static object GetPkValue(this object? obj, IUser? user = null)
@@ -82,5 +88,30 @@ public static class ObjectExtensions
         var pkName = dbContext!.GetKeyName(obj);
         var pkValue = obj.GetType().GetProperty(pkName!)?.GetValue(obj);
         return pkValue;
+    }
+
+    public static T DisableLazyLoading<T>(this object obj, Func<T> operation)
+    {
+        LazyLoader lazyLoader;
+        var lazyLoaderProperty = obj?.GetPropertyValueByReflection("LazyLoader");
+        if (lazyLoaderProperty != null)
+        {
+            lazyLoader = lazyLoaderProperty as LazyLoader;
+            var context = lazyLoader!.GetPropertyValueByExpression("Context") as DbContext;
+            var originalLazyLoadingEnabled = context.ChangeTracker.LazyLoadingEnabled;
+            context.ChangeTracker.LazyLoadingEnabled = false;
+            try
+            {
+                return operation.Invoke();
+            }
+            finally
+            {
+                context.ChangeTracker.LazyLoadingEnabled = originalLazyLoadingEnabled;
+            }
+        }
+        else
+        {
+            return operation.Invoke();
+        }
     }
 }

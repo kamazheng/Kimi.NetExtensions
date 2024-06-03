@@ -12,18 +12,32 @@ public static class PropertyExtentions
         LicenceHelper.CheckLicense();
     }
 
-    public static object GetPropertyValueByExpression<Tobj>(this Tobj self, string propertyName) where Tobj : class
+    public static object? GetPropertyValueByExpression<Tobj>(this Tobj self, string propertyName) where Tobj : class
     {
-        var param = Expression.Parameter(typeof(Tobj), "value");
-        var getter = Expression.Property(param, propertyName);
-        var boxer = Expression.TypeAs(getter, typeof(object));
-        var getPropValue = Expression.Lambda<Func<Tobj, object>>(boxer, param).Compile();
-        return getPropValue(self);
+        try
+        {
+            var param = Expression.Parameter(typeof(Tobj), "value");
+            var getter = Expression.Property(param, propertyName);
+            var boxer = Expression.TypeAs(getter, typeof(object));
+            var getPropValue = Expression.Lambda<Func<Tobj, object>>(boxer, param).Compile();
+            return getPropValue(self);
+        }
+        catch
+        {
+            return null;
+        }
     }
 
-    public static object? GetPropertyValueByReflection<Tobj>(this Tobj self, string propertyName) where Tobj : class
+    public static object? GetPropertyValueByReflection<Tobj>(this Tobj self, string propertyName)
     {
-        return self.GetType().GetProperty(propertyName)?.GetValue(self);
+        try
+        {
+            return self.GetType().GetProperty(propertyName)?.GetValue(self);
+        }
+        catch
+        {
+            return null;
+        }
     }
 
     public static void SetPropertyValue<Tobj>(this Tobj self, string propertyName, object? value)

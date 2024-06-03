@@ -14,6 +14,7 @@ using System.Text;
 /// </summary>
 public static class DbContextExtension
 {
+    public static string EfCoreProxyNameSpace { get; set; } = "Castle.Proxies";
     static DbContextExtension()
     {
         LicenceHelper.CheckLicense();
@@ -65,7 +66,12 @@ public static class DbContextExtension
 
     public static IEnumerable<string>? GetKeyNames(this DbContext _context, object entity)
     {
-        var keyNames = _context.Model?.FindEntityType(entity.GetType())?.FindPrimaryKey()?.Properties
+        var type = entity.GetType();
+        if (type.Namespace == EfCoreProxyNameSpace)
+        {
+            type = type.BaseType;
+        }
+        var keyNames = _context.Model?.FindEntityType(type)?.FindPrimaryKey()?.Properties
             .Select(x => x.Name);
         return keyNames;
     }
@@ -242,6 +248,10 @@ public static class DbContextExtension
 
     public static DbContext? GetDbContextFromTableClassType(this Type tableClassType, IUser? user = null)
     {
+        if (tableClassType.Namespace == EfCoreProxyNameSpace)
+        {
+            tableClassType = tableClassType.BaseType!;
+        }
         var dbContextTypes = TypeExtensions.NotSystemAssemblies
             .SelectMany(a => a.GetTypes())
             .Where(t => t.IsSubclassOf(typeof(DbContext)))
@@ -438,6 +448,13 @@ public static class DbContextExtension
             ?? throw new Exception($"{dto.TableClassFullName} {L.IsNotCorrectNoDatabaseEntityFound}!");
         var db = tableClassType.GetDbContextFromTableClassType(user)
             ?? throw new Exception($"{dto.TableClassFullName} {L.IsNotCorrectNoDatabaseFound}!");
+        return GetDbRecordsByDynamicLinq(dto, db);
+    }
+
+    public static IQueryable GetDbRecordsByDynamicLinq(TableQuery dto, DbContext db)
+    {
+        var tableClassType = dto.TableClassFullName!.GetClassType()
+            ?? throw new Exception($"{dto.TableClassFullName} {L.IsNotCorrectNoDatabaseEntityFound}!");
         var dbSet = db.Set(dto.TableClassFullName!)!.AsQueryable()
             ?? throw new Exception($"{dto.TableClassFullName} {L.IsNotCorrectNoDatabaseEntityFound}!");
         IQueryable<object> result = dbSet;
@@ -483,6 +500,7 @@ public static class DbContextExtension
             return finResult;
         }
     }
+
 
     public static object GetItem(RecordQuery query, IUser? user = null)
     {
