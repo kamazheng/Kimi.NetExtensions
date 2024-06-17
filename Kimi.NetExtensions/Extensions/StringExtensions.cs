@@ -335,4 +335,9 @@ public static class StringExtentions
     {
         return SHA.SHAmd5Encrypt(input);
     }
+
+    public static string ToWord(this IEnumerable<char> input)
+    {
+        return new string(input.ToArray());
+    }
 }

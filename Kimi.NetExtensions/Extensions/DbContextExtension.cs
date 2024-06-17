@@ -15,6 +15,7 @@ using System.Text;
 public static class DbContextExtension
 {
     public static string EfCoreProxyNameSpace { get; set; } = "Castle.Proxies";
+
     static DbContextExtension()
     {
         LicenceHelper.CheckLicense();
@@ -501,45 +502,52 @@ public static class DbContextExtension
         }
     }
 
-
     public static object GetItem(RecordQuery query, IUser? user = null)
     {
-        var tableClassType = query.TableClassFullName!.GetClassType()
-            ?? throw new Exception($"{query.TableClassFullName} {L.IsNotCorrectNoDatabaseEntityFound}!");
-        var db = tableClassType.GetDbContextFromTableClassType(user)
-            ?? throw new Exception($"{query.TableClassFullName} {L.IsNotCorrectNoDatabaseFound}!");
-        var dbSet = db.Set(query.TableClassFullName!)
-            ?? throw new Exception($"{query.TableClassFullName} {L.IsNotCorrectNoDatabaseEntityFound}!");
-        // Get the primary key property's type
-        var pkProperty = db.Model.FindEntityType(tableClassType)?.FindPrimaryKey()?.Properties[0]
-            ?? throw new Exception($"{query.TableClassFullName} {L.NoPrimaryKeyFound}!");
-        var pkType = pkProperty.ClrType;
-        // Convert the primary key value to the correct type
-        object convertedPk;
-        if (pkType == typeof(Guid))
+        DbContext db = default!;
+        try
         {
-            convertedPk = Guid.Parse(query.Id.ToString()!);
+            var tableClassType = query.TableClassFullName!.GetClassType()
+                ?? throw new Exception($"{query.TableClassFullName} {L.IsNotCorrectNoDatabaseEntityFound}!");
+            db = tableClassType.GetDbContextFromTableClassType(user)
+                ?? throw new Exception($"{query.TableClassFullName} {L.IsNotCorrectNoDatabaseFound}!");
+            var dbSet = db.Set(query.TableClassFullName!)
+                ?? throw new Exception($"{query.TableClassFullName} {L.IsNotCorrectNoDatabaseEntityFound}!");
+            // Get the primary key property's type
+            var pkProperty = db.Model.FindEntityType(tableClassType)?.FindPrimaryKey()?.Properties[0]
+                ?? throw new Exception($"{query.TableClassFullName} {L.NoPrimaryKeyFound}!");
+            var pkType = pkProperty.ClrType;
+            // Convert the primary key value to the correct type
+            object convertedPk;
+            if (pkType == typeof(Guid))
+            {
+                convertedPk = Guid.Parse(query.Id.ToString()!);
+            }
+            else
+            {
+                convertedPk = Convert.ChangeType(query.Id, pkType);
+            }
+            var result = dbSet.Where("1==1");
+            var dynamicLambda = $"{pkProperty.Name}==\"{convertedPk}\"";
+            if (query.IgnoreAutoInclude)
+            {
+                result = result.Where(dynamicLambda).IgnoreAutoIncludes();
+            }
+            else
+            {
+                result = result.Where(dynamicLambda);
+            }
+            foreach (var include in query.Includes)
+            {
+                result = result.Include(include);
+            }
+            return result.FirstOrDefault()
+                ?? throw new Exception($"{query.TableClassFullName} {L.RecordNotFound}!");
         }
-        else
+        finally
         {
-            convertedPk = Convert.ChangeType(query.Id, pkType);
+            db.Dispose();
         }
-        var result = dbSet.Where("1==1");
-        var dynamicLambda = $"{pkProperty.Name}==\"{convertedPk}\"";
-        if (query.IgnoreAutoInclude)
-        {
-            result = result.Where(dynamicLambda).IgnoreAutoIncludes();
-        }
-        else
-        {
-            result = result.Where(dynamicLambda);
-        }
-        foreach (var include in query.Includes)
-        {
-            result = result.Include(include);
-        }
-        return result.FirstOrDefault()
-            ?? throw new Exception($"{query.TableClassFullName} {L.RecordNotFound}!");
     }
 
     public static async Task<object> DeleteAsync(string tableClassFullName, object pk, IUser? user = null)

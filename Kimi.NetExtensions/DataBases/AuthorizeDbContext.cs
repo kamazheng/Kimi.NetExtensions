@@ -17,10 +17,16 @@ public class AuthorizeDbContext : BaseDbContext
         LicenceHelper.CheckLicense();
     }
 
-    public AuthorizeDbContext(IUser basicUser, DbContextOptions options) : base(basicUser, options)
-    {
-        LicenceHelper.CheckLicense();
-    }
+    //public AuthorizeDbContext(DbContextOptions<BaseDbContext> options, IUserAccessor userAccessor)
+    //: base(options, userAccessor)
+    //{
+    //    DbUser = userAccessor.User;
+    //}
+
+    //public AuthorizeDbContext(IUser basicUser, DbContextOptions options) : base(basicUser, options)
+    //{
+    //    LicenceHelper.CheckLicense();
+    //}
 
     //https://learn.microsoft.com/en-us/ef/core/modeling/dynamic-model
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

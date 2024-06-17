@@ -34,7 +34,12 @@ public static class ObjectExtensions
 
     public static T? JsonCopy<T>(this T? obj)
     {
-        return DisableLazyLoading<T>(obj, () => JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(obj)));
+        return DisableLazyLoading<T>(obj, () => JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(obj, jsonSetting), jsonSetting));
+    }
+
+    public static T? JsonCopy<T>(this T? obj, int detpt)
+    {
+        return DisableLazyLoading<T>(obj, () => JsonConvert.DeserializeObject<T>(obj.ToJson(detpt), jsonSetting));
     }
 
     public static object? JsonCopy(this object? obj, Type type)
@@ -52,6 +57,11 @@ public static class ObjectExtensions
         return DisableLazyLoading<string>(obj, () => JsonConvert.SerializeObject(obj, jsonSetting));
     }
 
+    public static string ToJson(this object obj, JsonSerializerSettings serializerSettings)
+    {
+        return DisableLazyLoading<string>(obj, () => JsonConvert.SerializeObject(obj, serializerSettings));
+    }
+
     public static string ToJson(this object obj, int maxDepth)
     {
         return DisableLazyLoading<string>(obj, () => ToJsonWithMaxDepth(obj, maxDepth));
@@ -65,7 +75,12 @@ public static class ObjectExtensions
             {
                 Func<bool> include = () => jsonWriter.CurrentDepth <= maxDepth;
                 var resolver = new CustomContractResolver(include);
-                var serializer = new JsonSerializer { ContractResolver = resolver };
+                var serializer = new JsonSerializer
+                {
+                    ContractResolver = resolver,
+                    TypeNameHandling = TypeNameHandling.Objects,
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                };
                 serializer.Serialize(jsonWriter, obj);
             }
             return strWriter.ToString();
@@ -97,8 +112,12 @@ public static class ObjectExtensions
         if (lazyLoaderProperty != null)
         {
             lazyLoader = lazyLoaderProperty as LazyLoader;
-            var context = lazyLoader!.GetPropertyValueByExpression("Context") as DbContext;
-            var originalLazyLoadingEnabled = context.ChangeTracker.LazyLoadingEnabled;
+            var context = lazyLoader?.GetPropertyValueByExpression("Context") as DbContext;
+            bool originalLazyLoadingEnabled = false;
+            if (context != null)
+            {
+                originalLazyLoadingEnabled = context.ChangeTracker.LazyLoadingEnabled;
+            }
             context.ChangeTracker.LazyLoadingEnabled = false;
             try
             {
@@ -106,7 +125,10 @@ public static class ObjectExtensions
             }
             finally
             {
-                context.ChangeTracker.LazyLoadingEnabled = originalLazyLoadingEnabled;
+                if (context != null)
+                {
+                    context.ChangeTracker.LazyLoadingEnabled = originalLazyLoadingEnabled;
+                }
             }
         }
         else

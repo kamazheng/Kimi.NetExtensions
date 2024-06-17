@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Kimi.NetExtensions.Model.Identities;
 
 [Table(nameof(UserRole), Schema = DbSchema.Reference)]
-public partial class UserRole : BaseAuditableObject, IWriteAccessEntity, IReadAccessEntity
+public partial class UserRole : BaseAuditableObject, IWriteAccessEntity
 {
     [Display(Name = "UserId", ResourceType = typeof(L))]
     public string UserId { get; set; } = null!;

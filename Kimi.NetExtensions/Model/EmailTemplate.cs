@@ -6,17 +6,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Kimi.NetExtensions.Model;
 
 [Table(nameof(EmailTemplate), Schema = DbSchema.Reference)]
-public partial class EmailTemplate : ISoftDeleteEntity, IWriteAccessEntity, IReadAccessEntity
+public partial class EmailTemplate : BaseObject, ISoftDeleteEntity, IWriteAccessEntity, IReadAccessEntity
 {
-    [Key]
-    [Column("EmailTemplatePK")]
-    public int EmailTemplatePk { get; set; }
-
-    [Required]
-    [MaxLength(50)]
-    [Display(Name = "Name", ResourceType = typeof(L))]
-    public string Name { get; set; } = string.Empty;
-
     [MaxLength(500)]
     [Display(Name = "Remark", ResourceType = typeof(L))]
     public string? Remark { get; set; }
@@ -42,15 +33,4 @@ public partial class EmailTemplate : ISoftDeleteEntity, IWriteAccessEntity, IRea
     [MaxLength(-1)]
     [Display(Name = "TemplateHtml", ResourceType = typeof(L))]
     public string? TemplateHtml { get; set; }
-
-    [Column("UPDATEDBY")]
-    [MaxLength(50)]
-    public string Updatedby { get; set; } = string.Empty;
-
-    [Column("UPDATED")]
-    [Precision(3)]
-    public DateTime Updated { get; set; }
-
-    [Column("ACTIVE")]
-    public bool Active { get; set; }
 }

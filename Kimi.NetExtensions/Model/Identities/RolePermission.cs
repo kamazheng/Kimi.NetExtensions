@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Kimi.NetExtensions.Model.Identities;
 
 [Table(nameof(RolePermission), Schema = DbSchema.Reference)]
-public partial class RolePermission : BaseAuditableObject, IWriteAccessEntity, IReadAccessEntity
+public partial class RolePermission : BaseAuditableObject, IWriteAccessEntity
 {
     [Required]
     [ForeignKey(nameof(Role))]

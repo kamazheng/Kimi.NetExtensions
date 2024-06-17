@@ -6,12 +6,8 @@ namespace Kimi.NetExtensions.Model.Auditing;
 
 [Table("AuditTrail", Schema = "Data")]
 [Index(nameof(TableName), nameof(AuditOn), nameof(Updated), nameof(Updatedby))]
-public class Trail : ISoftDeleteEntity, IReadAccessEntity
+public class Trail : BaseObject, IReadAccessEntity
 {
-    [Key]
-    [Column("AuditTrailPK")]
-    public int Id { get; set; }
-
     public string UserId { get; set; } = string.Empty;
 
     [MaxLength(50)]
@@ -34,15 +30,4 @@ public class Trail : ISoftDeleteEntity, IReadAccessEntity
 
     [MaxLength(100)]
     public string? PrimaryKey { get; set; }
-
-    [Column("UPDATEDBY")]
-    [MaxLength(50)]
-    public string Updatedby { get; set; } = null!;
-
-    [Column("UPDATED")]
-    [Precision(3)]
-    public DateTime Updated { get; set; }
-
-    [Column("ACTIVE")]
-    public bool Active { get; set; }
 }

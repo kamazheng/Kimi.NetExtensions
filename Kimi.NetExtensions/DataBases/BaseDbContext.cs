@@ -25,15 +25,21 @@ public class BaseDbContext : DbContext
     //{
     //}
 
-    public BaseDbContext(IUser user, DbContextOptions options) : base(options)
-    {
-        DbUser = user;
-    }
+    //public BaseDbContext(IUser user, DbContextOptions options) : base(options)
+    //{
+    //    DbUser = user;
+    //}
 
     public BaseDbContext(IUser user)
     {
         DbUser = user;
     }
+
+    //public BaseDbContext(DbContextOptions<BaseDbContext> options, IUserAccessor userAccessor)
+    //: base(options)
+    //{
+    //    DbUser = userAccessor.User;
+    //}
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
     {
