@@ -209,7 +209,7 @@ public class GenericTableController : ControllerBase
     /// </returns>
     [HttpPost]
     [Route("ImportExcel")]
-    public async Task<IActionResult> ImportExcel([FromForm(Name = "file")] IFormFile file)
+    public async Task<IActionResult> ImportExcel(IFormFile file)
     {
         var tableType = file.FileName.GetClassType();
         if (tableType == null)

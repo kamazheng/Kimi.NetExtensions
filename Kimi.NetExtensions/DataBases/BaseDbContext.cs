@@ -13,6 +13,8 @@ public class BaseDbContext : DbContext
 
     public DbSet<Trail> AuditTrails => Set<Trail>();
 
+    internal static string ProxyNameSpace = "Castle.Proxies";
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         // QueryFilters need to be applied before base.OnModelCreating
@@ -78,9 +80,16 @@ public class BaseDbContext : DbContext
             .Where(e => e.State is EntityState.Added or EntityState.Deleted or EntityState.Modified)
             .ToList())
         {
+            var tableType = entry.Entity.GetType();
+            if (tableType.Namespace == ProxyNameSpace)
+            {
+                tableType = tableType.BaseType;
+            }
+            var tableName = tableType?.Name;
+
             var trailEntry = new AuditTrail(entry)
             {
-                TableName = entry.Entity.GetType().Name,
+                TableName = tableName,
                 UserId = userId
             };
             trailEntries.Add(trailEntry);

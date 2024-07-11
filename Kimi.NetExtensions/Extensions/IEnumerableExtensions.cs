@@ -34,8 +34,7 @@ public static class IEnumerableExtensions
     }
 
     /// <summary>
-    /// 这个C#函数使用多任务处理技术来遍历一个列表中的每个元素，并对每个元素执行一个给定的操作。
-    /// 它将列表分成多个子列表，并为每个子列表创建一个任务。任务在后台线程中运行，然后等待所有任务完成。最后，它释放任务的资源并清空任务列表。
+    /// 这个C#函数使用多任务处理技术来遍历一个列表中的每个元素，并对每个元素执行一个给定的操作。 它将列表分成多个子列表，并为每个子列表创建一个任务。任务在后台线程中运行，然后等待所有任务完成。最后，它释放任务的资源并清空任务列表。
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="totalItems"></param>
@@ -76,6 +75,11 @@ public static class IEnumerableExtensions
         return source ?? Enumerable.Empty<T>().ToList();
     }
 
+    public static string Join<T>(this IEnumerable<T> source, char joinChar)
+    {
+        return string.Join(joinChar, source);
+    }
+
     public static bool HasDuplicates<T>(this IEnumerable<T> list)
     {
         return list.GroupBy(x => x).Any(x => x.Skip(1).Any());
@@ -91,6 +95,43 @@ public static class IEnumerableExtensions
 
         // 合并两个序列中的独特项
         return uniqueToFirstSequence.Union(uniqueToSecondSequence);
+    }
+
+    /// <summary>
+    /// Splits the given source collection into multiple parts based on the specified number of
+    /// parts. Each part will have approximately the same number of elements, with any remaining
+    /// elements distributed among the parts.
+    /// </summary>
+    /// <typeparam name="T">The type of elements in the source collection.</typeparam>
+    /// <param name="source">The source collection to be split.</param>
+    /// <param name="numberOfParts">The number of parts to split the collection into.</param>
+    /// <returns>
+    /// An IEnumerable of IEnumerable of T representing the split parts of the source collection.
+    /// </returns>
+    public static IEnumerable<IEnumerable<T>> SplitList<T>(this IEnumerable<T> source, int numberOfParts)
+    {
+        if (numberOfParts <= 0)
+        {
+            throw new ArgumentException("Number of parts must be greater than 0.", nameof(numberOfParts));
+        }
+
+        var sourceList = source.ToList(); // Convert to List for indexing operations
+        int totalCount = sourceList.Count;
+        int minSize = totalCount / numberOfParts;
+        int remainder = totalCount % numberOfParts;
+
+        List<IEnumerable<T>> result = new List<IEnumerable<T>>(numberOfParts);
+
+        int startIndex = 0;
+        for (int i = 0; i < numberOfParts; i++)
+        {
+            int size = minSize + (remainder > 0 ? 1 : 0);
+            result.Add(sourceList.Skip(startIndex).Take(size));
+            startIndex += size;
+            remainder--;
+        }
+
+        return result;
     }
 
     public static List<Dictionary<string, object?>> ToDictionaryList<T>(this IEnumerable<T> list)

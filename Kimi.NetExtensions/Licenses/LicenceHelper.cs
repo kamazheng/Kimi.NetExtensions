@@ -17,7 +17,6 @@ public static class LicenceHelper
     private static string? licenseServer;
 
     /// <summary>
-    ///
     /// </summary>
     /// <param name="_licenseServer"></param>
     public static void SetParameterByServer(string? _licenseServer = null)

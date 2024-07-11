@@ -10,8 +10,6 @@ using System.Linq.Expressions;
 /// </summary>
 public class AuthorizeDbContext : BaseDbContext
 {
-    private static string ProxyNameSpace = "Castle.Proxies";
-
     public AuthorizeDbContext(IUser user) : base(user)
     {
         LicenceHelper.CheckLicense();

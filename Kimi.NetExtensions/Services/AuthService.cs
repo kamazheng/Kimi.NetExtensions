@@ -14,8 +14,7 @@ public static class AuthService
     /// To Add JwtBearer and Windows Negotiation Authetication for Server side project. Client side
     /// need to use the customized authentication provider
     /// </summary>
-    /// <param name="services">
-    /// </param>
+    /// <param name="services"></param>
     public static void AddAuthenticationAndAuthorization(this IServiceCollection services)
     {
         services.AddAuthentication((options) =>
@@ -41,8 +40,7 @@ public static class AuthService
     /// <summary>
     /// Get the JWT token setting, JWT:Issuer for ValidIssuer and ValidAudience and JWT:Key requrired.
     /// </summary>
-    /// <returns>
-    /// </returns>
+    /// <returns></returns>
     public static TokenValidationParameters GetTokenValidationParameters()
     {
         return new TokenValidationParameters

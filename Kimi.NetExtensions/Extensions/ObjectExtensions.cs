@@ -37,6 +37,11 @@ public static class ObjectExtensions
         return DisableLazyLoading<T>(obj, () => JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(obj, jsonSetting), jsonSetting));
     }
 
+    public static T JsonConvertTo<T>(this object obj)
+    {
+        return JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(obj));
+    }
+
     public static T? JsonCopy<T>(this T? obj, int detpt)
     {
         return DisableLazyLoading<T>(obj, () => JsonConvert.DeserializeObject<T>(obj.ToJson(detpt), jsonSetting));
