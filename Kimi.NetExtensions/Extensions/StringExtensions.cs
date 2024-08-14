@@ -49,12 +49,9 @@ public static class StringExtentions
     /// <summary>
     /// 函数使用Replace方法将theValue中的所有removeStr替换为空字符串，并返回替换后的结果。
     /// </summary>
-    /// <param name="theValue">
-    /// </param>
-    /// <param name="removeStr">
-    /// </param>
-    /// <returns>
-    /// </returns>
+    /// <param name="theValue"></param>
+    /// <param name="removeStr"></param>
+    /// <returns></returns>
     public static string Remove(this string theValue, string removeStr)
     {
         return theValue.Replace(removeStr, "");
@@ -107,12 +104,9 @@ public static class StringExtentions
     /// <summary>
     /// return string ellipsis with "..." appendix
     /// </summary>
-    /// <param name="sValue">
-    /// </param>
-    /// <param name="iMaxLength">
-    /// </param>
-    /// <returns>
-    /// </returns>
+    /// <param name="sValue"></param>
+    /// <param name="iMaxLength"></param>
+    /// <returns></returns>
     public static string Ellipsis(this string sValue, int iMaxLength)
     {
         return sValue.Length > iMaxLength ? sValue.Left(iMaxLength - 3) + "..." : sValue;
@@ -181,6 +175,20 @@ public static class StringExtentions
         return null;
     }
 
+    public static int ToDefaultInt(this string? s)
+    {
+        int i;
+        if (int.TryParse(s, out i)) return i;
+        return default;
+    }
+
+    public static float ToDefaultFloat(this string? s)
+    {
+        float i;
+        if (float.TryParse(s, out i)) return i;
+        return default;
+    }
+
     /// <summary> Replace words in a sentence by dictionary<target_word_string, replace_string>
     /// Replaces words enclosed in square brackets, keep brackets. </summary> <param
     /// name="sourceString"></param> <param name="args"></param> <returns></returns>
@@ -198,10 +206,8 @@ public static class StringExtentions
     /// 这个C#函数用于将输入的字符串转换为整数。如果输入为空或 null 或包含非数字字符，则返回默认值。
     /// 函数使用正则表达式删除字符串中的非数字字符，并将其转换为整数。如果转换后的字符串长度小于等于一个整数的最大值，则返回转换后的整数； 否则，返回最大长度减1的整数。
     /// </summary>
-    /// <param name="input">
-    /// </param>
-    /// <returns>
-    /// </returns>
+    /// <param name="input"></param>
+    /// <returns></returns>
     public static int GetNumbersAsInteger(this string input)
     {
         if (string.IsNullOrEmpty(input))
@@ -318,6 +324,16 @@ public static class StringExtentions
 
         // 使用正则表达式匹配并保留字母和数字
         string cleaned = System.Text.RegularExpressions.Regex.Replace(input, @"[^a-zA-Z0-9]", "");
+        return cleaned;
+    }
+
+    public static string KeepAlphaNumericAndHyphen(this string input)
+    {
+        if (string.IsNullOrEmpty(input))
+            return input;
+
+        // 使用正则表达式匹配并保留字母、数字和中杠
+        string cleaned = System.Text.RegularExpressions.Regex.Replace(input, @"[^a-zA-Z0-9-]", "");
         return cleaned;
     }
 
