@@ -356,4 +356,36 @@ public static class StringExtentions
     {
         return new string(input.ToArray());
     }
+
+    /// <summary>
+    /// Gets the value of a specific key from a JSON string.
+    /// </summary>
+    /// <param name="jsonStr">The JSON string.</param>
+    /// <param name="key">The key to retrieve the value for.</param>
+    /// <returns>
+    /// The value associated with the specified key, or an empty string if the key is not found or
+    /// an error occurs.
+    /// </returns>
+    public static string GetJsonKeyValue(this string jsonStr, string key)
+    {
+        try
+        {
+            var data = (JObject)JsonConvert.DeserializeObject(jsonStr);
+            return data[key].Value<string>();
+        }
+        catch
+        {
+            return "";
+        }
+    }
+
+    /// <summary>
+    /// Removes HTML tags from the input string.
+    /// </summary>
+    /// <param name="input">The input string.</param>
+    /// <returns>The input string with HTML tags removed.</returns>
+    public static string StripHTML(this string input)
+    {
+        return Regex.Replace(input, "<.*?>", string.Empty);
+    }
 }

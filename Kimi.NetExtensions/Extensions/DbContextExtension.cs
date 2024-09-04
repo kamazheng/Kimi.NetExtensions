@@ -284,8 +284,7 @@ public static class DbContextExtension
     /// <summary>
     /// Get Table classes by DbContext DbSet property
     /// </summary>
-    /// <returns>
-    /// </returns>
+    /// <returns></returns>
     public static IEnumerable<Type> GetAllTableClasses()
     {
         return TypeExtensions.NotSystemAssemblies
@@ -435,14 +434,10 @@ public static class DbContextExtension
 
     /// <summary>
     /// </summary>
-    /// <param name="dto">
-    /// </param>
-    /// <param name="user">
-    /// </param>
-    /// <returns>
-    /// </returns>
-    /// <exception cref="Exception">
-    /// </exception>
+    /// <param name="dto"></param>
+    /// <param name="user"></param>
+    /// <returns></returns>
+    /// <exception cref="Exception"></exception>
     public static IQueryable GetDbRecordsByDynamicLinq(TableQuery dto, IUser? user = null)
     {
         var tableClassType = dto.TableClassFullName!.GetClassType()
@@ -608,5 +603,34 @@ public static class DbContextExtension
 
         var currentProperty = String.Join(".", properties, 0, index + 1);
         return $"{currentProperty} != null ? ({BuildExpression(properties, index + 1)}) : null";
+    }
+
+    public static DbContext? GetDbContext<T>(this DbSet<T> dbSet) where T : class
+    {
+        var infrastructure = (IInfrastructure<IServiceProvider>)dbSet;
+        var serviceProvider = infrastructure.Instance;
+        var currentDbContext = serviceProvider.GetService(typeof(ICurrentDbContext)) as ICurrentDbContext;
+        return currentDbContext?.Context;
+    }
+
+    public static DbContext? GetDbContext<T>(this IQueryable<T> queryable) where T : class
+    {
+        var queryCompiler = queryable.Provider.GetType()
+            .GetField("_queryCompiler", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+            ?.GetValue(queryable.Provider);
+
+        var queryContextFactory = queryCompiler?.GetType()
+            .GetField("_queryContextFactory", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+            ?.GetValue(queryCompiler);
+
+        var dependencies = queryContextFactory?.GetType()
+            .GetProperty("Dependencies", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+            ?.GetValue(queryContextFactory);
+
+        var dbContext = dependencies?.GetType()
+            .GetProperty("CurrentContext", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance)
+            ?.GetValue(dependencies) as ICurrentDbContext;
+
+        return dbContext?.Context;
     }
 }

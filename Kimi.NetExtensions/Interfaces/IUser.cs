@@ -11,6 +11,8 @@ public interface IUser
     string? JWT { get; set; }
     List<string>? Permissions { get; }
     List<string>? Roles { get; }
+
+    string ThumbNail { get; set; }
     bool IsRootUser { get; }
 
     bool CanReadTable(string tableFullName);
@@ -31,6 +33,7 @@ public class SysUser : IUser
     public string? EmulateUserName { get; set; }
     public string? FullName { get; set; }
     public string? JWT { get; set; }
+    public string ThumbNail { get; set; }
 
     public List<string>? Permissions { get; }
 
