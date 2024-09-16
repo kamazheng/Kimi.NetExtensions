@@ -20,6 +20,20 @@ public static class OpenId
     /// <param name="scopes">"openid", "profile", etc.</param>
     public static void AddOpenIdAuthentication(this WebApplicationBuilder builder, params string[] scopes)
     {
+        AddOpenIdService(builder, scopes);
+
+        builder.Services.AddScoped<AuthenticationStateProvider, OpenIdAuthStateProvider>();
+    }
+
+    /// <summary>
+    /// Adds OpenID authentication to the web application. NOT inject the OpenIdAuthStateProvider as AuthenticationStateProvider.
+    /// Configration: OIDC:ClientId, OIDC:ClientSecret, OIDC:Authority, OIDC:MetadataAddress,
+    /// OIDC:CallbackPath - /signin-oidc
+    /// </summary>
+    /// <param name="builder">The web application builder.</param>
+    /// <param name="scopes">"openid", "profile", etc.</param>
+    private static void AddOpenIdService(this WebApplicationBuilder builder, string[] scopes)
+    {
         builder.Services.AddAuthentication(options =>
         {
             options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -41,7 +55,5 @@ public static class OpenId
                 options.Scope.Add(scope);
             }
         });
-
-        builder.Services.AddScoped<AuthenticationStateProvider, OpenIdAuthStateProvider>();
     }
 }

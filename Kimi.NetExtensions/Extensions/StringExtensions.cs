@@ -3,6 +3,7 @@ using Microsoft.Data.SqlClient;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Globalization;
+using System.Text;
 using System.Text.RegularExpressions;
 
 public static class StringExtentions
@@ -387,5 +388,17 @@ public static class StringExtentions
     public static string StripHTML(this string input)
     {
         return Regex.Replace(input, "<.*?>", string.Empty);
+    }
+
+    public static string ToBase64(this string input)
+    {
+        byte[] bytes = Encoding.UTF8.GetBytes(input);
+        return Convert.ToBase64String(bytes);
+    }
+
+    public static string FromBase64(this string input)
+    {
+        byte[] bytes = Convert.FromBase64String(input);
+        return Encoding.UTF8.GetString(bytes);
     }
 }

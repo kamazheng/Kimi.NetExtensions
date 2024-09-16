@@ -1,1 +1,1 @@
-﻿dotnet nuget push Kimi.NetExtensions.1.1.2.nupkg --api-key oy2ozsnwud2s3i466q3ai5nvqcgo6s6efhdktmfvagaa74 --source https://api.nuget.org/v3/index.json
+﻿dotnet nuget push Kimi.NetExtensions.1.1.5.nupkg --api-key oy2ozsnwud2s3i466q3ai5nvqcgo6s6efhdktmfvagaa74 --source https://api.nuget.org/v3/index.json

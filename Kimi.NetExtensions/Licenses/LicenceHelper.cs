@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Kimi.NetExtensions.Extensions;
+using Newtonsoft.Json;
 using System.Reflection;
 using System.Text;
 
@@ -14,7 +15,7 @@ public static class LicenceHelper
         <RSAKeyValue><Modulus>mlFF55YRO8o/IYyfU8t9m53JkFR5UKgek5CuL5WZ9tcup2A4m+VokFiWmoiBrt9u/o/FIcmyVstcWB0T+TMX8zVIijVKzf4M9PlOOKe7dXdqOGujhufzu34Mj5MC1B2OYcygHuIrD7fyAw2B/H0hPEi1cJ91RP8akQ2bV7i95m0=</Modulus><Exponent>AQAB</Exponent></RSAKeyValue>
         """;
 
-    private static string? licenseServer;
+    private static string licenseServer = "";
 
     /// <summary>
     /// </summary>
@@ -23,7 +24,7 @@ public static class LicenceHelper
     {
         hostMachine = Environment.MachineName;
         appName = Assembly.GetEntryAssembly()?.GetName()?.Name;
-        licenseServer = _licenseServer ?? "https://molexchengduqa.azurewebsites.net/License/GetLicense";
+        licenseServer = _licenseServer ?? "https://molex-cdu.azurewebsites.net/License/GetLicense";
         GetReleasedLicense();
     }
 
@@ -81,6 +82,16 @@ public static class LicenceHelper
 
     private static void CheckLicense(string? encryptLicene)
     {
+        var liceneServerHost = (new Uri(licenseServer)).Host;
+        foreach (var hostServer in Kimi.NetExtensions.Services.Kimi.HostUris.OrEmptyIfNull())
+        {
+            var hostUri = new Uri(hostServer);
+            if (hostUri.Host == liceneServerHost)
+            {
+                return;
+            }
+        }
+
         if (encryptLicene is null) { throwRandomException(); }
         var licenseStr = RSAHelper.PublicKeyDecrypt(publicKey, encryptLicene!);
         var license = JsonConvert.DeserializeObject<License>(licenseStr);
