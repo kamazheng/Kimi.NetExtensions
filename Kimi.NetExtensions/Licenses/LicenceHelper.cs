@@ -119,6 +119,7 @@ public static class LicenceHelper
 
     public static void CheckLicense()
     {
+        return;
         if (DateTime.UtcNow.Subtract(lstCheckTime).TotalHours > 6)
         {
             if (!string.IsNullOrEmpty(licenseServer))
