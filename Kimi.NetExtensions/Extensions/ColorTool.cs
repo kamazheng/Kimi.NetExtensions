@@ -1,7 +1,6 @@
 ﻿using System.Drawing;
 
 public static class ColorTool
-
 {
 	static ColorTool() { LicenceHelper.CheckLicense(); }
 
