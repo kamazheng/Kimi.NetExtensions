@@ -15,13 +15,17 @@ namespace Kimi.NetExtensions.Services
         /// </summary>
         /// <param name="services">
         /// </param>
+        /// <param name="addXml"></param>
 
-        public static void AddJwtSwagger(this IServiceCollection services)
+        public static void AddJwtSwagger(this IServiceCollection services, bool addXml = false)
         {
             services.AddMvc();
             services.AddSwaggerGen(config =>
             {
-                AddSwaggerDocumentation(config);
+                if (addXml)
+                {
+                    AddSwaggerDocumentation(config);
+                }
                 config.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     Type = SecuritySchemeType.Http,
