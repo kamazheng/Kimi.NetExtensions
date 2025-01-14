@@ -1,0 +1,17 @@
+stages:
+  - build
+  - publish
+
+build-job:
+  stage: build
+  script:
+    - dotnet restore
+    - dotnet build --configuration Release
+
+publish-job:
+  stage: publish
+  script:
+    - dotnet pack --configuration Release --output ./nupkg
+    - dotnet nuget push ./nupkg/*.nupkg --api-key oy2ozsnwud2s3i466q3ai5nvqcgo6s6efhdktmfvagaa74 --source https://gitlab.com/api/v4/projects/<your_project_id>/packages/nuget/index.json
+  only:
+    - tags
