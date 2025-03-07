@@ -11,7 +11,7 @@
         <PackageId>Kimi.NetExtensions</PackageId>
         <Authors>Kama Zheng</Authors>
         <Description>Extensions of .Net</Description>
-        <PackageProjectUrl>https://github.com/kamazheng/Kimi.MudBlazorExtentions</PackageProjectUrl>
+        <PackageProjectUrl>https://github.com/kamazheng/Kimi.NetExtensions</PackageProjectUrl>
         <PackageTags>.Net, C#, Extension</PackageTags>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageIcon>Icon.png</PackageIcon>
