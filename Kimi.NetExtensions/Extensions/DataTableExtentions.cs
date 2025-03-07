@@ -5,7 +5,7 @@ public static class DataTableExtentions
 {
     static DataTableExtentions()
     {
-        LicenceHelper.CheckLicense();
+        
     }
 
     public static List<T> MapTableToList<T>(this DataTable table) where T : new()

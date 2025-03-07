@@ -4,7 +4,7 @@ public static class IEnumerableExtensions
 {
     static IEnumerableExtensions()
     {
-        LicenceHelper.CheckLicense();
+        
     }
 
     public static bool HasItem<T>(this IEnumerable<T>? enumerable)

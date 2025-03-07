@@ -7,7 +7,7 @@ public static class ExcelService
 {
     static ExcelService()
     {
-        LicenceHelper.CheckLicense();
+        
     }
 
     /// <summary>

@@ -1,6 +1,6 @@
 ﻿public static class GuidExtensions
 {
-    static GuidExtensions() { LicenceHelper.CheckLicense(); }
+    static GuidExtensions() {  }
 
     public static Guid GenerateComb()
     {

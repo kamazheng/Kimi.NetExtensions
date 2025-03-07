@@ -16,7 +16,7 @@ public class ChallengeNegotiateUser
     {
         _next = next;
         _url = url;
-        LicenceHelper.CheckLicense();
+        
     }
 
     public async Task Invoke(HttpContext context)

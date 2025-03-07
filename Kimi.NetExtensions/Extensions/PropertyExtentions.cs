@@ -9,7 +9,7 @@ public static class PropertyExtentions
 {
     static PropertyExtentions()
     {
-        LicenceHelper.CheckLicense();
+
     }
 
     public static object? GetPropertyValueByExpression<Tobj>(this Tobj self, string propertyName) where Tobj : class

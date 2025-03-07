@@ -10,7 +10,7 @@ public static class StringExtentions
 {
     static StringExtentions()
     {
-        LicenceHelper.CheckLicense();
+        
     }
 
     public static bool ContainDigit(this string inputString)

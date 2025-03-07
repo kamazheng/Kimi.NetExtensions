@@ -1,6 +1,6 @@
 ﻿public static class StreamExtensions
 {
-    static StreamExtensions() { LicenceHelper.CheckLicense(); }
+    static StreamExtensions() {  }
 
     public static async Task<string> ConvertToBase64Async(this Stream stream)
     {

@@ -36,7 +36,7 @@ public class HttpService : IHttpService
     )
     {
         _httpClient = httpClient;
-        LicenceHelper.CheckLicense();
+        
     }
 
     public async Task<T> Get<T>(string uri, CancellationToken token = default)

@@ -11,7 +11,7 @@ public class UserNameModelCacheKeyFactory : IModelCacheKeyFactory
 {
     public UserNameModelCacheKeyFactory(IServiceProvider serviceProvider)
     {
-        LicenceHelper.CheckLicense();
+        
     }
 
     public object Create(DbContext context)

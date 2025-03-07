@@ -4,7 +4,6 @@ using System.Linq.Expressions;
 
 public static class ModelBuilderExtensions
 {
-    static ModelBuilderExtensions() => LicenceHelper.CheckLicense();
     public static ModelBuilder AppendGlobalQueryFilter<TInterface>(this ModelBuilder modelBuilder, Expression<Func<TInterface, bool>> filter)
     {
         // get a list of entities without a baseType that implement the interface TInterface

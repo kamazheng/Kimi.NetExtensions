@@ -61,7 +61,6 @@ namespace Kimi.NetExtensions.Services
             {
                 EnvironmentExtension.EnvironmentName = systemEnvironment;
             }
-            LicenceHelper.SetParameterByServer(licenseServer);
         }
 
     }

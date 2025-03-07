@@ -12,7 +12,7 @@ public static class GenericTableTools
 {
     static GenericTableTools()
     {
-        LicenceHelper.CheckLicense();
+        
     }
 
     /// <summary> Get all table classes from dbcontext dbset<> </summary> <param

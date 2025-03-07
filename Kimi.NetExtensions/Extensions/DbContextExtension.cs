@@ -18,7 +18,7 @@ public static class DbContextExtension
 
     static DbContextExtension()
     {
-        LicenceHelper.CheckLicense();
+        
     }
 
     public static IQueryable<object>? Set(this DbContext _context, Type t)

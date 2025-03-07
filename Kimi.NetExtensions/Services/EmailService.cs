@@ -6,7 +6,7 @@ public static class EmailService
 {
     static EmailService()
     {
-        LicenceHelper.CheckLicense();
+        
     }
 
     private static string? _smtpServer;

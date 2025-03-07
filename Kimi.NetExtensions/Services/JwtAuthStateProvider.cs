@@ -12,7 +12,7 @@ public class JwtAuthStateProvider : AuthenticationStateProvider
 
     public JwtAuthStateProvider(IAccessTokenProvider tokenProvider)
     {
-        LicenceHelper.CheckLicense();
+        
         _tokenProvider = tokenProvider;
     }
 

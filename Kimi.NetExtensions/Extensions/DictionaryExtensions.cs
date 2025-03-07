@@ -1,7 +1,7 @@
 ﻿
 public static class DictionaryExtensions
 {
-    static DictionaryExtensions() { LicenceHelper.CheckLicense(); }
+    static DictionaryExtensions() {  }
 
     public static Dictionary<string, T> ToCaseInsensitive<T>(this Dictionary<string, T> dict)
     {

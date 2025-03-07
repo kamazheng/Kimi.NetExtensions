@@ -14,7 +14,7 @@ public static class ObjectExtensions
 
     static ObjectExtensions()
     {
-        LicenceHelper.CheckLicense();
+        
     }
 
     public static bool IsPrimaryKeyDefault(this object? obj)

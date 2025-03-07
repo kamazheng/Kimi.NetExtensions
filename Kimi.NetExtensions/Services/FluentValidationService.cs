@@ -11,7 +11,6 @@ using System.Reflection;
 /// </summary>
 public static class FluentValidationService
 {
-    static FluentValidationService() => LicenceHelper.CheckLicense();
     public static Func<object, string, Task<IEnumerable<string>>> ValidateValue => async (model, propertyName) =>
     {
         Type modelType = model.GetType();

@@ -8,8 +8,6 @@ using Microsoft.IdentityModel.Tokens;
 
 public static class AuthService
 {
-    static AuthService() => LicenceHelper.CheckLicense();
-
     /// <summary>
     /// To Add JwtBearer and Windows Negotiation Authetication for Server side project. Client side
     /// need to use the customized authentication provider

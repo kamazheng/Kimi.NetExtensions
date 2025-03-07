@@ -20,7 +20,7 @@ public class BaseDbContext : DbContext
         // QueryFilters need to be applied before base.OnModelCreating
         modelBuilder.AppendGlobalQueryFilter<ISoftDeleteEntity>(s => s.Active == true);
         base.OnModelCreating(modelBuilder);
-        LicenceHelper.CheckLicense();
+        
     }
 
     //public BaseDbContext()

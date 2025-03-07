@@ -5,7 +5,7 @@ public static class DynamicClassExtensions
 {
     static DynamicClassExtensions()
     {
-        LicenceHelper.CheckLicense();
+        
     }
 
     /// <summary>

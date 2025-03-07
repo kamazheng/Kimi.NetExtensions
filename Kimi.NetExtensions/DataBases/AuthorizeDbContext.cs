@@ -12,7 +12,7 @@ public class AuthorizeDbContext : BaseDbContext
 {
     public AuthorizeDbContext(IUser user) : base(user)
     {
-        LicenceHelper.CheckLicense();
+
     }
 
     //public AuthorizeDbContext(DbContextOptions<BaseDbContext> options, IUserAccessor userAccessor)
@@ -23,7 +23,7 @@ public class AuthorizeDbContext : BaseDbContext
 
     //public AuthorizeDbContext(IUser basicUser, DbContextOptions options) : base(basicUser, options)
     //{
-    //    LicenceHelper.CheckLicense();
+    //    
     //}
 
     //https://learn.microsoft.com/en-us/ef/core/modeling/dynamic-model

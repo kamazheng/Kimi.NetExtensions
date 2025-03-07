@@ -2,7 +2,7 @@
 
 public static class Json
 {
-    static Json() { LicenceHelper.CheckLicense(); }
+    static Json() {  }
 
     public static void SetOptions()
     {

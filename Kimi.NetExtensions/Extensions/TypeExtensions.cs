@@ -9,7 +9,7 @@ public static class TypeExtensions
 {
     static TypeExtensions()
     {
-        LicenceHelper.CheckLicense();
+
     }
 
     public static Assembly[] NotSystemAssemblies { get; set; }
